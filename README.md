@@ -225,4 +225,6 @@ reamostras por exame.
 | Random Forest centro | validação, 89 exames | 0,409 (0,323 a 0,505) | 0,405 | 0,559 |
 
 A CNN foi escolhida entre cinco versões pela validação e avaliada uma vez no teste. O Random
-Forest não foi avaliado no teste. Os detalhes estão em `docs/10` a `docs/12`.
+Forest não foi avaliado no teste. Os detalhes estão em `docs/10` a `docs/12`, e o caminho
+inteiro, dos dados ao teste, com os erros encontrados, está no
+[dossiê da modelagem](docs/13-dossie-modelagem.md).
