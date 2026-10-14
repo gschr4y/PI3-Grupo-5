@@ -1,0 +1,27 @@
+{
+  "features_recalculadas_dos_recortes": {
+    "exames": 3,
+    "candidatos": 2655,
+    "diferenca_maxima": {
+      "media": 9.71445146547012e-17,
+      "desvio_padrao": 9.71445146547012e-17,
+      "curtose": 3.552713678800501e-15,
+      "minimo": 9.71445146547012e-17,
+      "maximo": 1.1102230246251565e-16,
+      "percentil_25": 9.71445146547012e-17,
+      "percentil_75": 9.71445146547012e-17
+    }
+  },
+  "separacao_rf_treino": 0.9999971095446187,
+  "separacao_rf_validacao": 0.5931912698094997,
+  "separacao_por_feature_validacao": {
+    "media": 0.45325981078953337,
+    "desvio_padrao": 0.42637749133786124,
+    "curtose": 0.5444426653145279,
+    "minimo": 0.47319223721139175,
+    "maximo": 0.5212566550578439,
+    "percentil_25": 0.468351891882275,
+    "percentil_75": 0.464083814810367
+  },
+  "teste_utilizado": false
+}

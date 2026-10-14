@@ -22,6 +22,8 @@ def test_froc_oficial_denominador_e_excluidos(tmp_path):
     metricas = avaliacao_oficial.avaliar(previsoes, ["a"], anotacoes, excluidas,
                                         tmp_path / "avaliacao", 42, 20, .95)
     assert metricas["cpm"] == pytest.approx(.5)
+    assert metricas["cpm_ic_inferior"] == pytest.approx(.5)
+    assert metricas["cpm_ic_superior"] == pytest.approx(.5)
     assert metricas["sensibilidade_4fp"] == pytest.approx(.5)
     analise = (tmp_path / "avaliacao/CADAnalysis.txt").read_text()
     assert "False negatives: 1" in analise

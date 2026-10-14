@@ -20,3 +20,5 @@ memória na hora.
 | [0004](0004-espacamento-alvo-de-1-mm.md) | o espaçamento alvo da reamostragem é 1 mm isotrópico |
 | [0005](0005-dvc-para-o-pipeline-e-nao-para-o-dado.md) | DVC para o pipeline e não para guardar o dado |
 | [0006](0006-normalizacao-entra-no-volume-salvo.md) | a normalização [0, 1] entra no volume salvo |
+| [0007](0007-cnn-treina-na-gpu-com-determinismo-parcial.md) | a CNN treina na GPU, com determinismo que avisa em vez de interromper |
+| [0008](0008-modelo-congelado-para-o-teste.md) | o modelo congelado para a avaliação final no teste |

@@ -387,7 +387,7 @@ stages:
           cache: false
 
   treinar_cnn:
-    cmd: .venv-cnn/bin/python scripts/18_treinar_cnn.py --saida ${caminhos.cnn_treino}
+    cmd: .venv-cnn-gpu/bin/python scripts/18_treinar_cnn.py --saida ${caminhos.cnn_treino}
     deps:
       - scripts/18_treinar_cnn.py
       - src/experimentos/cnn.py
@@ -398,7 +398,7 @@ stages:
       - src/detection/patches.py
       - src/config.py
       - third_party/luna16
-      - requirements-cnn-cpu.lock.txt
+      - requirements-cnn-gpu.lock.txt
       - notebooks/curvafroc_pesquisa.ipynb
       - dados/processado/divisao.csv
       - dados/processado/patches
@@ -417,3 +417,135 @@ stages:
       - ${caminhos.cnn_treino}:
           cache: false
           persist: true
+
+  treinar_cnn_variante:
+    foreach: ${experimentos_cnn}
+    do:
+      cmd: .venv-cnn-gpu/bin/python scripts/18_treinar_cnn.py --variante ${key} --saida modelos/cnn_${key}
+      deps:
+        - scripts/18_treinar_cnn.py
+        - src/experimentos/cnn.py
+        - src/experimentos/avaliacao_oficial.py
+        - src/experimentos/rastreamento.py
+        - src/detection/procedencia_recortes.py
+        - scripts/09_extrair_patches.py
+        - src/detection/patches.py
+        - src/config.py
+        - third_party/luna16
+        - requirements-cnn-gpu.lock.txt
+        - notebooks/curvafroc_pesquisa.ipynb
+        - dados/processado/divisao.csv
+        - dados/processado/patches
+        - dados/processado/volumes
+        - ${caminhos.luna16_candidatos}
+        - ${caminhos.luna16_anotacoes}
+        - ${caminhos.luna16_anotacoes_excluidas}
+      params:
+        - configuracao/config.yaml:
+            - seed
+            - cnn
+            - avaliacao
+            - experimentos_cnn.${key}
+            - rastreamento.experimento
+      outs:
+        - modelos/cnn_${key}:
+            cache: false
+            persist: true
+
+  avaliar_random_forest:
+    cmd: .venv/bin/python scripts/22_avaliar_random_forest.py
+    deps:
+      - scripts/22_avaliar_random_forest.py
+      - src/experimentos/avaliacao_oficial.py
+      - src/experimentos/rastreamento.py
+      - src/config.py
+      - third_party/luna16
+      - requirements-rastreamento.lock.txt
+      - ${caminhos.random_forest}
+      - dados/processado/divisao.csv
+      - ${caminhos.luna16_candidatos}
+      - ${caminhos.luna16_anotacoes}
+      - ${caminhos.luna16_anotacoes_excluidas}
+    params:
+      - configuracao/config.yaml:
+          - seed
+          - avaliacao
+          - rastreamento.experimento
+          - caminhos.random_forest_validacao
+    outs:
+      - ${caminhos.random_forest_validacao}:
+          cache: false
+          persist: true
+
+  comparar_validacao:
+    cmd: .venv/bin/python scripts/23_comparar_validacao.py
+    deps:
+      - scripts/23_comparar_validacao.py
+      - src/config.py
+      - ${caminhos.random_forest}
+      - ${caminhos.random_forest_validacao}
+      - ${caminhos.cnn_treino}
+      - modelos/cnn_epocas_40
+      - modelos/cnn_aumento
+      - modelos/cnn_negativos_20
+      - modelos/cnn_lr_3e-4
+      - ${caminhos.random_forest_centro}
+      - ${caminhos.luna16_candidatos}
+    params:
+      - configuracao/config.yaml:
+          - seed
+          - avaliacao.intervalo_confianca
+          - caminhos.comparacao_validacao
+          - comparacao
+    outs:
+      - ${caminhos.comparacao_validacao}:
+          cache: false
+
+  diagnosticar_random_forest:
+    cmd: .venv/bin/python scripts/24_diagnosticar_random_forest.py
+    deps:
+      - scripts/24_diagnosticar_random_forest.py
+      - src/detection/features.py
+      - src/config.py
+      - ${caminhos.random_forest}
+      - dados/intermediario/caracteristicas_treino.csv
+      - dados/intermediario/caracteristicas_validacao.csv
+      - dados/processado/patches
+    params:
+      - configuracao/config.yaml:
+          - seed
+          - caminhos.diagnostico_random_forest
+    outs:
+      - ${caminhos.diagnostico_random_forest}:
+          cache: false
+
+  treinar_random_forest_centro:
+    cmd: .venv/bin/python scripts/25_treinar_random_forest_centro.py
+    deps:
+      - scripts/25_treinar_random_forest_centro.py
+      - src/detection/features.py
+      - src/experimentos/avaliacao_oficial.py
+      - src/experimentos/rastreamento.py
+      - src/config.py
+      - third_party/luna16
+      - requirements-rastreamento.lock.txt
+      - dados/processado/divisao.csv
+      - dados/processado/patches
+      - ${caminhos.luna16_candidatos}
+      - ${caminhos.luna16_anotacoes}
+      - ${caminhos.luna16_anotacoes_excluidas}
+    params:
+      - configuracao/config.yaml:
+          - seed
+          - random_forest
+          - random_forest_centro
+          - avaliacao
+          - rastreamento.experimento
+          - caminhos.random_forest_centro
+          - caminhos.caracteristicas_centro
+    outs:
+      - ${caminhos.random_forest_centro}:
+          cache: false
+          persist: true
+      - ${caminhos.caracteristicas_centro}:
+          cache: false

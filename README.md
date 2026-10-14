@@ -53,10 +53,12 @@ Geração própria de candidatos por blob detection 3D nos 888 exames: 14.310.04
 16.114,9 por exame, alcançando 1.158 dos 1.186 nódulos. Divisão fixa por paciente em treino,
 validação e teste, sem vazamento entre as três partes.
 
-O recorte dos cubos ao redor de cada candidato tem código e teste, mas nunca rodou na base.
-As features de intensidade do treino e da validação estão extraídas. O script aceita treino ou validação,
-com retomada por exame. Ver [extração de características](docs/06-extracao-caracteristicas.md).
-Ainda não existem modelo treinado e avaliação FROC válidos.
+O recorte dos cubos ao redor de cada candidato da lista V2 rodou nos 888 exames: 754.975
+recortes, com hash do volume e do extrator gravado em cada arquivo. As features de intensidade do
+treino e da validação estão extraídas, com retomada por exame. Ver
+[extração de características](docs/06-extracao-caracteristicas.md). Random Forest e CNN estão
+treinados e avaliados com o programa oficial do LUNA16; a CNN escolhida na validação foi avaliada
+uma vez no teste (seção Resultados).
 
 A comparação exploratória dos parâmetros do LoG tem protocolo, amostra fixa e validação
 separada em `docs/05-calibracao-detector.md`. O limiar 0,20 reduziu 67,1% dos candidatos na
@@ -123,7 +125,7 @@ nova execução reaproveita os exames completos antes de montar o CSV consolidad
 
 O `13` depende do `dados/intermediario/pacientes.csv`. Fora dessa lista fica o
 `01_pacientes.py`, que gera esse mapa lendo o metadata do LIDC-IDRI e só roda em máquina que o
-tenha, e o `09_extrair_patches.py`, que nunca rodou na base.
+tenha. Os recortes, os modelos e as avaliações rodam pelo DVC, no passo 4.
 
 O DVC agora inclui divisão, detecção, calibração encerrada e features de treino e
 validação e treinamento do Random Forest. O MLflow registra a conferência das features
@@ -138,15 +140,38 @@ e os experimentos de treinamento. Os comandos e os limites do registro estão em
 O painel do MLflow fica em http://127.0.0.1:5000. O primeiro registro contém a
 preparação dos dados, sem métricas de modelo. Ainda não há remote DVC.
 
-O [primeiro treino do Random Forest](docs/08-primeiro-treino.md) usa somente a
-partição de treino e salva os escores da validação. A avaliação FROC e o teste final
-são etapas separadas.
+**4. Recortes, modelos e avaliação**
 
-**4. Testes**
+A CNN usa ambientes próprios: `.venv-cnn`, com PyTorch para CPU, para os recortes, e
+`.venv-cnn-gpu`, com PyTorch para CUDA, para o treino. A instalação está em
+[CNN e MLflow](docs/09-cnn-mlflow.md).
 
 ```bash
-.venv/bin/python -m pytest testes -q
+.venv/bin/dvc repro patches
+.venv/bin/dvc repro treinar_random_forest avaliar_random_forest treinar_random_forest_centro
+.venv/bin/dvc repro treinar_cnn treinar_cnn_variante@lr_3e-4
+.venv/bin/dvc repro comparar_validacao diagnosticar_random_forest
 ```
+
+Esses estágios usam só treino e validação. A avaliação no teste é um comando separado, para o
+modelo congelado (decisão 0008):
+
+```bash
+.venv-cnn-gpu/bin/python scripts/20_avaliar_teste_cnn.py --modelo modelos/cnn_lr_3e-4/modelo.pt --saida <pasta-nova>
+```
+
+Os registros estão em [primeiro treino do Random Forest](docs/08-primeiro-treino.md),
+[comparação na validação](docs/10-comparacao-validacao.md),
+[experimentos na validação](docs/11-experimentos-validacao.md) e
+[avaliação final no teste](docs/12-avaliacao-final-teste.md).
+
+**5. Testes**
+
+```bash
+.venv-cnn-gpu/bin/python -m pytest testes -q
+```
+
+Os testes da CNN precisam do PyTorch; os demais também rodam na `.venv`.
 
 A contagem atual de testes é informada pela execução do comando acima. Os que precisam abrir volume são
 pulados automaticamente se o disco com o LUNA16 não estiver acessível, e escolhem sozinhos os
@@ -188,9 +213,16 @@ Samuel Gonçalves Malta, Gabriel Schraider da Silveira, Lucas Gabriel Teixeira d
 
 Projeto Integrador de Extensão III, Inteligência Artificial, Biopark, 2026/2.
 
-## CNN em preparação
+## Resultados
 
-O extrator e a CNN da PR #5 estão integrados localmente, com verificação de origem
-dos recortes e avaliação final separada do treino. O ambiente CPU, os comandos e
-as limitações da verificação técnica estão em [CNN e MLflow](docs/09-cnn-mlflow.md).
-O lote completo de NPZ com procedência ainda precisa ser gerado antes do treino longo.
+Medidos em 13/10/2026 com o programa oficial do LUNA16, intervalo de 95% por bootstrap de 1.000
+reamostras por exame.
+
+| Modelo | Conjunto | CPM | Sensibilidade a 1 FP/exame | Sensibilidade a 4 FP/exame |
+|---|---|---|---|---|
+| CNN congelada (`cnn_lr_3e-4`) | teste, 176 exames | 0,724 (0,670 a 0,778) | 0,735 (0,659 a 0,819) | 0,883 (0,843 a 0,929) |
+| CNN congelada (`cnn_lr_3e-4`) | validação, 89 exames | 0,752 (0,681 a 0,819) | 0,784 | 0,883 |
+| Random Forest centro | validação, 89 exames | 0,409 (0,323 a 0,505) | 0,405 | 0,559 |
+
+A CNN foi escolhida entre cinco versões pela validação e avaliada uma vez no teste. O Random
+Forest não foi avaliado no teste. Os detalhes estão em `docs/10` a `docs/12`.

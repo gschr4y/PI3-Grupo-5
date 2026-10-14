@@ -18,6 +18,7 @@ from tqdm import tqdm
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 import config
 from detection import patches
+from detection.procedencia_recortes import assinatura
 
 
 def argumentos():
@@ -39,11 +40,13 @@ def metadados(grupo):
     }
 
 
-def validar_arquivo(caminho, grupo, tamanho):
+def validar_arquivo(caminho, grupo, tamanho, origem=None):
     """Confere tamanho, faixa, coordenadas, classes e IDs contra a lista V2."""
     with np.load(caminho, allow_pickle=False) as dados:
-        if set(dados.files) != {"patches", *metadados(grupo)}:
+        if set(dados.files) != {"patches", "procedencia", *metadados(grupo)}:
             raise ValueError("campos do NPZ inesperados")
+        if origem is not None and json.loads(str(dados["procedencia"])) != origem:
+            raise ValueError("volume ou codigo de origem mudou")
         cubos = dados["patches"]
         if cubos.shape != (len(grupo), *tamanho[::-1]):
             raise ValueError(f"formato incorreto: {cubos.shape}")
@@ -75,12 +78,13 @@ def extrair(imagem, grupo, tamanho):
     return recortes
 
 
-def salvar(destino, grupo, recortes, tamanho):
+def salvar(destino, grupo, recortes, tamanho, origem=None):
     temporario = destino.with_name(f"{destino.stem}.tmp{destino.suffix}")
     try:
         with open(temporario, "wb") as arquivo:
-            np.savez_compressed(arquivo, patches=recortes, **metadados(grupo))
-        bytes_gravados = validar_arquivo(temporario, grupo, tamanho)
+            np.savez_compressed(arquivo, patches=recortes, **metadados(grupo),
+                                procedencia=json.dumps(origem, sort_keys=True))
+        bytes_gravados = validar_arquivo(temporario, grupo, tamanho, origem)
         temporario.replace(destino)
         return bytes_gravados
     finally:
@@ -127,10 +131,17 @@ def main():
     for seriesuid, grupo in tqdm(candidatos.groupby("seriesuid"), desc="Extraindo patches",
                                  unit="exame"):
         destino = saida / f"{seriesuid}.npz"
+        caminho = volumes / f"{seriesuid}.mha"
+        try:
+            origem = assinatura(caminho, tamanho)
+        except OSError as erro:
+            contagem["falhou"] += 1
+            falhas.append({"seriesuid": seriesuid, "erro": str(erro)})
+            continue
         ja_existe = destino.exists()
         if ja_existe:
             try:
-                tamanho_arquivo = validar_arquivo(destino, grupo, tamanho)
+                tamanho_arquivo = validar_arquivo(destino, grupo, tamanho, origem)
                 contagem["existente"] += 1
                 recortes_validos += len(grupo)
                 bytes_validos += tamanho_arquivo
@@ -143,7 +154,7 @@ def main():
                 raise FileNotFoundError(f"volume pre-processado nao encontrado: {caminho}")
             imagem = sitk.ReadImage(str(caminho))
             recortes = extrair(imagem, grupo, tamanho)
-            tamanho_arquivo = salvar(destino, grupo, recortes, tamanho)
+            tamanho_arquivo = salvar(destino, grupo, recortes, tamanho, origem)
             contagem["recriado" if ja_existe else "criado"] += 1
             recortes_validos += len(grupo)
             bytes_validos += tamanho_arquivo

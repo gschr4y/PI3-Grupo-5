@@ -1,8 +1,5 @@
 """Cria a divisão fixa de exames sem separar séries do mesmo paciente."""
 
-import pandas as pd
-
-
 PARTICOES = ("treino", "validacao", "teste")
 
 

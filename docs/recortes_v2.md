@@ -46,3 +46,12 @@ python scripts/09_extrair_patches.py `
   --volumes "G:\Meu Drive\PI3-Grupo-5\Dataset\processado\volumes" `
   --saida "G:\Meu Drive\PI3-Grupo-5\Dataset\processado\patches"
 ```
+
+## Integração local em 05/10/2026
+
+A versão integrada acrescenta procedência dentro de cada NPZ. Arquivos sem essa
+procedência, gerados antes da integração, precisam ser recriados pelo extrator.
+Mudar o volume ou o código invalida a retomada. A CNN também confere a origem.
+O estágio DVC `patches` usa os caminhos do YAML, incluindo a lista V2 no HD.
+A execução completa descrita acima é a medição original, não uma execução local
+com o novo formato de procedência. Ver `docs/09-cnn-mlflow.md`.

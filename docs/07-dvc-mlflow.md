@@ -9,7 +9,7 @@ Instalamos DVC 3.67.1 e MLflow 3.16.1 em 04/10/2026, sem alterar as versões que
 já estavam instaladas para o processamento de imagens. O arquivo
 `requirements-rastreamento.lock.txt` contém as versões do ambiente conferido
 nesta etapa, incluindo dependências transitivas. Ele não declara um ambiente
-de treinamento de CNN: PyTorch e a configuração de GPU serão tratados nessa etapa.
+de treinamento de CNN. O ambiente separado da CNN está descrito em `docs/09-cnn-mlflow.md`.
 
 ```bash
 .venv/bin/python -m pip install -r requirements-rastreamento.lock.txt
@@ -18,7 +18,7 @@ de treinamento de CNN: PyTorch e a configuração de GPU serão tratados nessa e
 
 ## DVC
 
-O `dvc.yaml` contém 16 estágios após expandir treino e validação:
+O `dvc.yaml` contém 18 estágios após expandir treino e validação:
 
 - Oito estágios anteriores de inventário, coordenadas, pré-processamento e análise.
 - Divisão por paciente.
@@ -29,6 +29,13 @@ O `dvc.yaml` contém 16 estágios após expandir treino e validação:
 - Conferência das features e registro no MLflow.
 - Treinamento do Random Forest e probabilidades da validação.
 - Conferência das marcações excluídas nas listas V2 e própria.
+- Extração e verificação dos recortes V2.
+- Treinamento da CNN e avaliação da validação.
+
+Os dois estágios da CNN foram adicionados à definição do pipeline. Sua presença
+no YAML não significa que a execução completa esteja concluída. O lock registra
+apenas as execuções concluídas pelo DVC. A avaliação final de teste é um comando
+separado, descrito no guia da CNN.
 
 As novas saídas usam `cache: false`: o DVC registra seus hashes sem duplicar os
 volumes ou as tabelas grandes no cache. Usamos `persist: true` nessas saídas
@@ -55,7 +62,9 @@ dvc repro registrar_preparacao
 ```
 
 Ativar a `.venv` é necessário para os comandos dos oito estágios antigos,
-que usam `python`. As novas etapas usam explicitamente `.venv/bin/python`.
+que usam `python`. As etapas de rastreamento e Random Forest usam explicitamente `.venv/bin/python`;
+os recortes usam `.venv-cnn/bin/python`, e o treino da CNN, `.venv-cnn-gpu/bin/python`
+(decisão 0007).
 Quando houver mudanças, `repro` pode executar as dependências do alvo;
 o modo `--dry` permite conferir isso antes.
 

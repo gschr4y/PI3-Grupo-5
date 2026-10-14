@@ -25,6 +25,13 @@ def adaptar(nome, texto):
         texto = texto.replace("basex=2", "base=2")
         texto = texto.replace("plt.grid(b=True", "plt.grid(visible=True")
         texto = texto.replace("bbox_inches=0", "bbox_inches=None")
+        texto = texto.replace(
+            "    return all_fps, sens_mean, sens_lb, sens_up",
+            "    global cpm_replicas\n"
+            "    cpm_replicas = np.array([np.mean(np.interp([0.125, 0.25, 0.5, 1, 2, 4, 8], f, s)) "
+            "for f, s in zip(fps_lists, sens_lists)])\n"
+            "    return all_fps, sens_mean, sens_lb, sens_up",
+        )
         # sklearn retorna TPR NaN quando não há positivos detectados.
         # O denominador oficial ainda inclui os nódulos sem candidato: sensibilidade = 0.
         texto = texto.replace(
@@ -64,7 +71,8 @@ def avaliar(previsoes, exames, anotacoes, excluidas, destino, semente, bootstrap
             f"oficial.bNumberOfBootstrapSamples = {bootstrap}\n"
             f"oficial.bConfidence = {confianca!r}\n"
             f"oficial.noduleCADEvaluation({str(anotacoes.resolve())!r}, {str(excluidas.resolve())!r}, "
-            f"{str(series.resolve())!r}, {str(resultados.resolve())!r}, {str(destino.resolve())!r})\n",
+            f"{str(series.resolve())!r}, {str(resultados.resolve())!r}, {str(destino.resolve())!r})\n"
+            f"np.savetxt({str((destino / 'cpm_bootstrap.csv').resolve())!r}, oficial.cpm_replicas, delimiter=',')\n",
             encoding="utf-8",
         )
         ambiente = {**os.environ, "MPLBACKEND": "Agg", "PYTHONHASHSEED": str(semente)}
@@ -88,6 +96,12 @@ def avaliar(previsoes, exames, anotacoes, excluidas, destino, semente, bootstrap
                           "bootstrap_media": media, "ic_inferior": inferior, "ic_superior": superior})
     tabela.to_csv(destino / "pontos_operacao.csv", index=False)
     metricas = {"cpm": float(np.mean(sensibilidades))}
+    replicas = np.atleast_1d(np.loadtxt(destino / "cpm_bootstrap.csv", delimiter=","))
+    if len(replicas) != bootstrap or not np.isfinite(replicas).all():
+        raise ValueError("replicas de CPM invalidas")
+    cauda = (1 - confianca) / 2
+    metricas.update(cpm_ic_inferior=float(np.quantile(replicas, cauda)),
+                    cpm_ic_superior=float(np.quantile(replicas, 1 - cauda)))
     for fp, sens, baixo, alto in zip(pontos, sensibilidades, inferior, superior):
         chave = str(fp).replace(".", "_")
         metricas.update({f"sensibilidade_{chave}fp": float(sens),
@@ -98,6 +112,6 @@ def avaliar(previsoes, exames, anotacoes, excluidas, destino, semente, bootstrap
                  "exames": len(uids), "fontes": hashes, "metricas": metricas,
                  "curva_pontos": len(curva), "curva_bootstrap_pontos": len(ic),
                  "correcao_caso_de_borda": "TPR NaN sem positivos detectados passa a sensibilidade zero",
-                 "cpm": "media das 7 sensibilidades da curva pontual; IC por ponto do bootstrap oficial"}
+                 "cpm": "media das 7 sensibilidades; IC do CPM calculado nas replicas oficiais por exame"}
     (destino / "avaliacao.json").write_text(json.dumps(protocolo, indent=2), encoding="utf-8")
     return metricas

@@ -431,3 +431,84 @@ de situação e comparação do detector. O pipeline contém 16 estágios. Os te
 da integração passaram em 126 casos, incluindo rejeição de cache com identidade
 incorreta e de pasta sem manifesto. O treinamento e a avaliação oficial continuam
 sendo etapas separadas; os escores de validação do primeiro treino estão salvos.
+
+## Atualização de 05/10/2026: preparação local da CNN
+
+Integramos localmente a PR #5 à base `7ec3da3`, preservando o detector e o primeiro
+Random Forest. A integração ainda não foi publicada. Os recortes passaram a guardar
+o hash do volume e do código de extração, conferidos também antes do treinamento.
+O comando de treino usa somente treino e validação; a avaliação final do teste
+ficou em `scripts/20_avaliar_teste_cnn.py`, sem ajuste de pesos.
+
+Criamos um ambiente separado em `.venv-cnn`, com PyTorch para CPU. O driver NVIDIA
+não estava acessível na verificação local. O comando
+`.venv-cnn/bin/python -m pytest testes -q` passou em 136 testes. O `pip check`
+do ambiente passou sem conflitos.
+
+Executamos `scripts/19_preparar_reproducao_cnn.py` e `scripts/18_treinar_cnn.py`
+em quatro exames reais, dois de treino e dois de validação, por uma época.
+O run `9002b29b2f0d4c06a1388e8bd300baf1` terminou no MLflow como `FINISHED`,
+com `teste_utilizado=false`, pesos, probabilidades e avaliação oficial.
+O CPM de validação foi 0; esse ensaio verifica o fluxo, não o desempenho completo.
+
+O pipeline passou a definir 18 estágios. Iniciamos
+`.venv/bin/dvc repro --single-item patches` para preparar os 888 exames com a
+nova procedência. No momento deste registro, a extração completa estava em
+execução e o treinamento completo da CNN não havia sido iniciado.
+
+## Conferência de 06/10/2026: recortes completos
+
+A execução `.venv/bin/dvc repro --single-item patches` terminou. O arquivo
+`dados/intermediario/resumo_patches.json` registra 888 arquivos válidos e
+754.975 recortes válidos, sem falhas ou arquivos extras. A extração levou
+5.444,36 segundos e produziu 39.690.009.514 bytes. O CSV de falhas contém
+apenas o cabeçalho, e o log confirma a atualização do `dvc.lock`.
+
+O primeiro treinamento completo da CNN ainda não foi iniciado. A integração
+da PR #5 permanece local, com conflitos resolvidos, sem commit de merge ou
+publicação. O modelo técnico de quatro exames continua separado do treino completo.
+
+## Atualização de 12/10/2026: primeiro treino completo da CNN, na GPU
+
+O driver NVIDIA passou a responder, com uma RTX 4050 de 6 GB. Criamos `.venv-cnn-gpu`
+com `torch==2.14.0+cu130` e as demais versões iguais ao lock de CPU, registradas em
+`requirements-cnn-gpu.lock.txt`. O modo determinístico estrito interrompe o treino na
+GPU, no gradiente do `MaxPool3d`; na GPU ele passou a só avisar (decisão 0007). A
+suíte `.venv-cnn-gpu/bin/python -m pytest testes -q` passou em 137 testes. O estágio
+de recortes continua no ambiente de CPU, e o `dvc repro --dry treinar_cnn` confirmou
+que só o treino seria executado.
+
+Executamos `.venv/bin/dvc repro treinar_cnn`. O run `4f52dc350af44d099574a26ac1567731`
+terminou como `FINISHED`, com `teste_utilizado=false`, em 13 min 17 s. Foram 6.588
+candidatos de treino, 1.098 positivos, e a loss caiu de 0,659 para 0,404 em 15 épocas.
+Na validação, com 89 exames e 111 nódulos, o avaliador oficial mediu sensibilidade de
+0,270 a 1 FP por exame (IC95% 0,175 a 0,367), 0,405 a 4 FP por exame (IC95% 0,306 a
+0,525) e CPM de 0,268 (IC95% 0,198 a 0,358). A curva completa está em
+`docs/09-cnn-mlflow.md`. O teste não foi avaliado. A integração da PR #5 continua local,
+sem commit.
+
+## Atualização de 13/10/2026: Random Forest e CNN avaliados na mesma validação
+
+Executamos `.venv/bin/dvc repro comparar_validacao diagnosticar_random_forest`. O
+Random Forest foi avaliado pelo programa oficial com os escores salvos em 04/10, sem novo
+treino, no run `e3ed9e0c20ac4494aa6d97af2c779baa`. Nos mesmos 89 exames e 75.063
+candidatos da CNN, o CPM do Random Forest foi 0,003 (IC95% 0,000 a 0,007) contra 0,268
+da CNN (IC95% 0,198 a 0,358). A diferença pareada foi 0,265, com IC95% de 0,196 a 0,354.
+
+Testamos as quatro hipóteses do professor para o Random Forest fraco: features
+diferentes das da CNN, rótulo deslocado, coluna de probabilidade invertida e conjuntos
+diferentes de candidatos. Nenhuma se confirmou. O modelo separa o treino com 1,000 e a
+validação com 0,593, e cada feature sozinha fica entre 0,426 e 0,544. O registro
+completo está em `docs/10-comparacao-validacao.md`. O teste não foi avaliado.
+
+## Atualização de 13/10/2026: experimentos na validação e avaliação final no teste
+
+Testamos quatro variantes da CNN e um Random Forest com estatísticas do centro do cubo, só com
+treino e validação (`docs/11-experimentos-validacao.md`). A melhor configuração na validação,
+com 40 épocas, aumento de dados, 20 negativos por positivo e learning rate 0,0003, teve CPM 0,752.
+O Random Forest centro foi de CPM 0,003 para 0,409.
+
+Congelamos essa CNN pela decisão 0008 e a avaliamos uma vez nos 176 exames de teste, no run
+`d754f0738780451a8a734be0ac58a435`. O CPM foi 0,724 (IC95% 0,670 a 0,778), com sensibilidade de
+0,735 a 1 FP por exame e de 0,883 a 4 FP por exame (IC95% 0,843 a 0,929). O registro está em
+`docs/12-avaliacao-final-teste.md`.

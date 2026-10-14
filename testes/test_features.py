@@ -95,3 +95,39 @@ def test_candidato_fora_do_volume_fica_na_auditoria():
         "status": "descartado",
         "motivo": "centro_fora_do_volume",
     }]
+
+
+def test_lote_reproduz_calcular_cubo_a_cubo():
+    gerador = np.random.default_rng(3)
+    cubos = gerador.random((5, 34, 34, 34), dtype=np.float32)
+    cubos[2] = 0.25
+    lote = features.calcular_lote(cubos)
+    for i, cubo in enumerate(cubos):
+        esperado = features.calcular(cubo)
+        for coluna in features.COLUNAS:
+            assert lote.loc[i, coluna] == pytest.approx(esperado[coluna], rel=1e-12, abs=1e-12)
+    assert lote.loc[2, "curtose"] == 0.0
+
+
+def test_multiescala_recorta_o_centro_de_cada_lado():
+    cubos = np.zeros((1, 34, 34, 34), dtype=np.float32)
+    cubos[0, 13:21, 13:21, 13:21] = 1
+    medidas = features.calcular_multiescala(cubos, [8, 16, 34])
+    assert medidas.loc[0, "media_8"] == 1.0
+    assert medidas.loc[0, "media_16"] == pytest.approx(8 ** 3 / 16 ** 3)
+    assert medidas.loc[0, "media_34"] == pytest.approx(8 ** 3 / 34 ** 3)
+    with pytest.raises(ValueError, match="centra"):
+        features.calcular_multiescala(cubos, [9])
+
+
+def test_multiescala_do_exame_recusa_identidade_divergente(tmp_path):
+    cubos = np.zeros((2, 34, 34, 34), dtype=np.float32)
+    np.savez_compressed(tmp_path / "a.npz", patches=cubos, candidate_id=np.array([5, 6]),
+                        classe_luna16=np.array([1, 0], dtype=np.int8))
+    esperado = pd.DataFrame({"seriesuid": ["a", "a"], "class": [1, 0]}, index=[5, 6])
+    medidas = features.multiescala_do_exame(tmp_path / "a.npz", esperado, [8, 34])
+    assert medidas.candidate_id.tolist() == [5, 6] and medidas.classe_luna16.tolist() == [1, 0]
+    with pytest.raises(ValueError, match="candidate_id"):
+        features.multiescala_do_exame(tmp_path / "a.npz", esperado.set_axis([5, 7]), [8])
+    with pytest.raises(ValueError, match="classes"):
+        features.multiescala_do_exame(tmp_path / "a.npz", esperado.assign(**{"class": [0, 0]}), [8])

@@ -13,7 +13,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import average_precision_score, f1_score, precision_score, recall_score, roc_auc_score
 import torch
 
 import config
@@ -27,19 +26,21 @@ def argumentos():
     parser.add_argument("--saida", type=Path, required=True, help="pasta nova para preservar cada execução")
     parser.add_argument("--escopo", default="divisao_completa", help="identificação explícita da população avaliada")
     parser.add_argument("--reproduzir-de", type=Path, help="confere pesos, previsões e FROC contra execução anterior")
+    parser.add_argument("--variante", help="nome em experimentos_cnn do YAML; sobrescreve chaves de cnn")
     return parser.parse_args()
 
 
-def metricas_classificacao(dados):
-    real = dados["class"].to_numpy()
-    previsto = dados.probability.ge(0.5).to_numpy()
-    metricas = {"precision": precision_score(real, previsto, zero_division=0),
-                "recall": recall_score(real, previsto, zero_division=0),
-                "f1": f1_score(real, previsto, zero_division=0)}
-    if len(np.unique(real)) == 2:
-        metricas.update(auc_roc=roc_auc_score(real, dados.probability),
-                        average_precision=average_precision_score(real, dados.probability))
-    return {k: float(v) for k, v in metricas.items()}
+def aplicar_variante(cfg, nome):
+    parametros = dict(cfg["cnn"])
+    if nome is None:
+        return parametros
+    mudancas = cfg.get("experimentos_cnn", {}).get(nome)
+    if mudancas is None:
+        raise ValueError(f"variante inexistente em experimentos_cnn: {nome}")
+    desconhecidas = set(mudancas) - set(parametros) - {"aumento"}
+    if desconhecidas:
+        raise ValueError(f"chaves desconhecidas na variante {nome}: {sorted(desconhecidas)}")
+    return {**parametros, **mudancas}
 
 
 def conferir_reproducao(anterior, destino, recibo):
@@ -48,7 +49,7 @@ def conferir_reproducao(anterior, destino, recibo):
         if antigo[chave] != recibo[chave]:
             raise ValueError(f"reproducao divergiu em {chave}")
     verificados = []
-    for particao in ("validacao", "teste"):
+    for particao in ("validacao",):
         for nome in (f"probabilidades_{particao}.csv", f"avaliacao_{particao}/curva_froc_completa.csv",
                      f"avaliacao_{particao}/froc_predicoes_bootstrapping.csv"):
             if rastreamento.sha256(anterior / nome) != rastreamento.sha256(destino / nome):
@@ -61,7 +62,7 @@ def conferir_reproducao(anterior, destino, recibo):
 def main():
     args = argumentos()
     cfg = config.carregar(args.config)
-    parametros = dict(cfg["cnn"])
+    parametros = aplicar_variante(cfg, args.variante)
     if parametros["epochs"] < 1 or parametros["negativos_por_positivo"] < 1:
         raise ValueError("epochs e negativos_por_positivo precisam ser positivos")
     destino = args.saida.resolve()
@@ -89,7 +90,9 @@ def main():
         raise ValueError("lista V2 invalida")
     if not set(divisao.seriesuid).issubset(set(candidatos.seriesuid)):
         raise ValueError("exames da divisao ausentes na lista V2")
-    for uid in divisao.seriesuid:
+    ativos = divisao.loc[divisao.particao.isin(["treino", "validacao"])]
+    cnn.conferir_origem(pasta, caminhos["volumes"], ativos.seriesuid)
+    for uid in ativos.seriesuid:
         entrada[f"patches/{uid}"] = pasta / f"{uid}.npz"
     for nome in avaliacao_oficial.FONTES:
         entrada[f"avaliador/{nome}"] = avaliacao_oficial.ORIGEM / nome
@@ -99,15 +102,18 @@ def main():
     for caminho in entrada.values():
         if not caminho.is_file():
             raise FileNotFoundError(caminho)
-    config.fixar_semente(cfg["seed"])
-    cnn.fixar_determinismo(cfg["seed"], parametros["threads"])
     device = parametros["device"]
     if device == "auto":
         device = "cuda" if torch.cuda.is_available() else "cpu"
     if device == "cuda" and not torch.cuda.is_available():
         raise ValueError("CUDA solicitada, mas indisponivel")
+    config.fixar_semente(cfg["seed"])
+    cnn.fixar_determinismo(cfg["seed"], parametros["threads"], device)
     registro = {**parametros, "device": device, "seed": cfg["seed"], "torch": torch.__version__,
+                "determinismo": "estrito" if device == "cpu" else "parcial_gpu",
+                "gpu": torch.cuda.get_device_name() if device == "cuda" else "nenhuma",
                 "arquitetura": "CNN3D_3conv_16_32_64", "escopo": args.escopo,
+                "variante": args.variante or "base", "aumento": parametros.get("aumento", False),
                 "bootstrap": cfg["avaliacao"]["bootstrap_reamostras"],
                 "confianca": cfg["avaliacao"]["intervalo_confianca"],
                 "preprocessamento": "V2_normalizado_0_1_mascara_pulmao_1mm_crop_central",
@@ -120,7 +126,7 @@ def main():
     destino.mkdir(parents=True)
     with rastreamento.iniciar(cfg, f"CNN3D {args.escopo}", "treinamento_cnn", registro,
                              entrada) as (cliente, run_id):
-        cliente.set_tag(run_id, "teste_utilizado", "true")
+        cliente.set_tag(run_id, "teste_utilizado", "false")
         cliente.set_tag(run_id, "avaliacao", "LUNA16_oficial_python3")
         if args.reproduzir_de:
             cliente.set_tag(run_id, "reproducao_de", json.loads(
@@ -129,7 +135,7 @@ def main():
 
         def registrar(linha):
             print(f"Epoca {linha['epoch']}: loss={linha['train_loss']:.6f}", flush=True)
-            for nome in ("train_loss", "train_accuracy"):
+            for nome in ("train_loss",):
                 cliente.log_metric(run_id, nome, linha[nome], step=linha["epoch"])
 
         inicio = perf_counter()
@@ -141,7 +147,8 @@ def main():
         peso_hash = cnn.hash_pesos(modelo)
         torch.save({"state_dict": modelo.cpu().state_dict(), "parametros": parametros,
                     "seed": cfg["seed"], "dados_sha256": versao_dados,
-                    "run_id": run_id}, destino / "modelo.pt")
+                    "run_id": run_id, "divisao_sha256": rastreamento.sha256(entrada["divisao"]),
+                    "candidatos_sha256": rastreamento.sha256(entrada["candidatos"])}, destino / "modelo.pt")
         restaurado = cnn.CNN3D(parametros["dropout_rate"])
         restaurado.load_state_dict(torch.load(destino / "modelo.pt", map_location="cpu",
                                              weights_only=True)["state_dict"])
@@ -151,12 +158,12 @@ def main():
         selecionados.to_csv(destino / "candidatos_treino.csv", index=False)
         historico.to_csv(destino / "historico.csv", index=False)
         divisao.to_csv(destino / "divisao.csv", index=False)
-        for particao in ("validacao", "teste"):
+        for particao in ("validacao",):
             print(f"Prevendo todos os candidatos de {particao}", flush=True)
             previsoes = cnn.prever(restaurado, candidatos, divisao, particao, pasta, parametros, device)
             previsoes.to_csv(destino / f"probabilidades_{particao}.csv", index=False)
             exames = divisao.loc[divisao.particao.eq(particao), "seriesuid"].tolist()
-            medidas = {**metricas_classificacao(previsoes), "exames": len(exames),
+            medidas = {"exames": len(exames),
                        "candidatos": len(previsoes), "positivos": int(previsoes["class"].sum())}
             medidas.update(avaliacao_oficial.avaliar(
                 previsoes, exames, entrada["anotacoes"], entrada["excluidas"],
@@ -164,7 +171,7 @@ def main():
                 cfg["avaliacao"]["bootstrap_reamostras"], cfg["avaliacao"]["intervalo_confianca"]))
             metricas.update({f"{particao}_{k}": float(v) for k, v in medidas.items()})
         recibo = {"run_id": run_id, "parametros": registro, "dados_sha256": versao_dados,
-                  "pesos_sha256": peso_hash, "metricas": metricas, "teste_utilizado": True,
+                  "pesos_sha256": peso_hash, "metricas": metricas, "teste_utilizado": False,
                   "avaliacao_froc": "oficial", "escopo": args.escopo,
                   "entrada_teste_usada_no_treino": False}
         if args.reproduzir_de:
@@ -176,7 +183,7 @@ def main():
         cliente.log_artifact(run_id, str(origem), artifact_path="origem")
         cliente.log_artifacts(run_id, str(destino), artifact_path="cnn")
     print(json.dumps({"run_id": run_id, "pesos_sha256": peso_hash,
-                      "teste_cpm": metricas["teste_cpm"], "saida": str(destino)}, indent=2), flush=True)
+                      "validacao_cpm": metricas["validacao_cpm"], "saida": str(destino)}, indent=2), flush=True)
 
 
 if __name__ == "__main__":

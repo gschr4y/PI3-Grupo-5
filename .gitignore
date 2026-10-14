@@ -54,6 +54,8 @@ __pycache__/
 build/
 dist/
 .venv/
+.venv-cnn/
+.venv-cnn-gpu/
 venv/
 env/
 .python-version
@@ -80,3 +82,6 @@ Thumbs.db
 mlruns/
 mlartifacts/
 mlflow.db*
+
+# Artefatos locais de ferramentas de revisão.
+.gstack/

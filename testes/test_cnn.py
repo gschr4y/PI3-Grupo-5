@@ -72,3 +72,57 @@ def test_checkpoint_restaurado_preserva_logits(tmp_path):
     with torch.inference_mode():
         torch.testing.assert_close(modelo(entrada), restaurado(entrada), rtol=0, atol=0)
     assert cnn.hash_pesos(modelo) == cnn.hash_pesos(restaurado)
+
+
+def test_determinismo_estrito_na_cpu_e_so_aviso_na_gpu():
+    cnn.fixar_determinismo(42, 1, "cuda")
+    assert torch.are_deterministic_algorithms_enabled()
+    assert torch.is_deterministic_algorithms_warn_only_enabled()
+    cnn.fixar_determinismo(42, 1)
+    assert not torch.is_deterministic_algorithms_warn_only_enabled()
+
+
+def test_aumento_preserva_forma_valores_e_centro_a_um_voxel():
+    cubos = torch.zeros(8, 1, 32, 32, 32)
+    cubos[:, 0, 16, 16, 16] = 1
+    gerador = torch.Generator().manual_seed(0)
+    saida = cnn.aumentar(cubos, gerador)
+    assert saida.shape == cubos.shape
+    assert torch.equal(saida.sum(dim=(1, 2, 3, 4)), cubos.sum(dim=(1, 2, 3, 4)))
+    # O centro de um cubo de 32 fica entre os índices 15 e 16; espelhar troca um pelo outro.
+    marcados = saida[:, 0].nonzero()[:, 1:]
+    assert ((marcados >= 15) & (marcados <= 16)).all()
+
+
+def exames_sinteticos(pasta):
+    linhas, gerador = [], np.random.default_rng(0)
+    for uid in ("a", "b"):
+        classes = np.array([1, 0, 0, 0, 1, 0, 0, 0])
+        cubos = gerador.random((len(classes), 34, 34, 34), dtype=np.float32) * 0.5
+        cubos[classes == 1, 13:21, 13:21, 13:21] = 1
+        ids = np.arange(len(linhas), len(linhas) + len(classes))
+        coords = np.arange(len(classes), dtype=np.float32)
+        np.savez_compressed(Path(pasta) / f"{uid}.npz", patches=cubos, candidate_id=ids,
+                            coordX=coords, coordY=coords, coordZ=coords,
+                            classe_luna16=classes.astype(np.int8))
+        linhas += [{"seriesuid": uid, "coordX": c, "coordY": c, "coordZ": c, "class": k}
+                   for c, k in zip(coords.astype(float), classes)]
+    candidatos = pd.DataFrame(linhas)
+    tabela = pd.DataFrame({"seriesuid": ["a", "b", "c"], "paciente": ["p1", "p2", "p3"],
+                           "subset": [0, 0, 1], "particao": ["treino", "treino", "validacao"]})
+    return candidatos, tabela
+
+
+def pesos_treinados(pasta, candidatos, tabela, **extra):
+    parametros = {"negativos_por_positivo": 3, "patch_size": 32, "batch_size": 4,
+                  "dropout_rate": 0.3, "learning_rate": 1e-3, "weight_decay": 0.0, "epochs": 2, **extra}
+    cnn.fixar_determinismo(42, 1)
+    modelo, _, _ = cnn.treinar(candidatos, tabela, pasta, parametros, 42, "cpu", lambda linha: None)
+    return cnn.hash_pesos(modelo)
+
+
+def test_aumento_desligado_treina_igual_ao_caminho_sem_o_parametro(tmp_path):
+    candidatos, tabela = exames_sinteticos(tmp_path)
+    sem_parametro = pesos_treinados(tmp_path, candidatos, tabela)
+    assert pesos_treinados(tmp_path, candidatos, tabela, aumento=False) == sem_parametro
+    assert pesos_treinados(tmp_path, candidatos, tabela, aumento=True) != sem_parametro

@@ -1,11 +1,14 @@
 """CNN3D extraída da pesquisa; treino amostrado e inferência completa por exame."""
 
 import hashlib
+import json
+import os
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import torch
+from detection.procedencia_recortes import assinatura
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset, WeightedRandomSampler
 
@@ -32,12 +35,14 @@ class CNN3D(nn.Module):
         return self.classifier(self.features(x))
 
 
-def fixar_determinismo(semente, threads):
+def fixar_determinismo(semente, threads, device="cpu"):
+    os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
     torch.set_num_threads(threads)
     torch.manual_seed(semente)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(semente)
-    torch.use_deterministic_algorithms(True)
+    # Decisão 0007: na GPU o modo determinístico avisa em vez de interromper.
+    torch.use_deterministic_algorithms(True, warn_only=device == "cuda")
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
 
@@ -48,8 +53,8 @@ def conferir_divisao(tabela):
         raise ValueError("divisao precisa de seriesuid, paciente, subset e particao sem vazios")
     if tabela.seriesuid.duplicated().any():
         raise ValueError("exame duplicado na divisao")
-    if set(tabela.particao) != {"treino", "validacao", "teste"}:
-        raise ValueError("divisao precisa conter treino, validacao e teste")
+    if not {"treino", "validacao"}.issubset(set(tabela.particao)) or not set(tabela.particao).issubset({"treino", "validacao", "teste"}):
+        raise ValueError("divisao precisa conter treino e validacao, com teste opcional")
     if tabela.groupby("paciente").particao.nunique().gt(1).any():
         raise ValueError("paciente compartilhado entre particoes")
 
@@ -93,6 +98,15 @@ def selecionar_treino(candidatos, divisao, proporcao, semente):
     return selecionados
 
 
+def aumentar(cubos, gerador):
+    """Espelha cada cubo ao acaso nos três eixos e gira o lote em múltiplos de 90 graus no plano axial."""
+    for eixo in (2, 3, 4):
+        espelhar = torch.rand(len(cubos), generator=gerador, device=cubos.device) < 0.5
+        cubos = torch.where(espelhar[:, None, None, None, None], cubos.flip(eixo), cubos)
+    voltas = int(torch.randint(4, (1,), generator=gerador, device=cubos.device))
+    return torch.rot90(cubos, voltas, dims=(3, 4))
+
+
 def treinar(candidatos, divisao, pasta, parametros, semente, device, registrar):
     selecionados = selecionar_treino(candidatos, divisao, parametros["negativos_por_positivo"], semente)
     blocos, rotulos = [], []
@@ -113,21 +127,25 @@ def treinar(candidatos, divisao, pasta, parametros, semente, device, registrar):
     otimizador = torch.optim.Adam(modelo.parameters(), lr=parametros["learning_rate"],
                                  weight_decay=parametros["weight_decay"])
     criterio = nn.CrossEntropyLoss()
+    gerador_aumento = None
+    if parametros.get("aumento", False):
+        gerador_aumento = torch.Generator(device=device).manual_seed(semente)
     historico = []
     for epoca in range(1, parametros["epochs"] + 1):
         modelo.train()
-        perda, acertos, total = 0.0, 0, 0
+        perda, total = 0.0, 0
         for cubos, classes in loader:
             cubos, classes = cubos.to(device), classes.to(device)
+            if gerador_aumento is not None:
+                cubos = aumentar(cubos, gerador_aumento)
             otimizador.zero_grad()
             logits = modelo(cubos)
             loss = criterio(logits, classes)
             loss.backward()
             otimizador.step()
             perda += loss.item() * len(classes)
-            acertos += (logits.argmax(1) == classes).sum().item()
             total += len(classes)
-        linha = {"epoch": epoca, "train_loss": perda / total, "train_accuracy": acertos / total}
+        linha = {"epoch": epoca, "train_loss": perda / total}
         historico.append(linha)
         registrar(linha)
     return modelo, selecionados, pd.DataFrame(historico)
@@ -160,3 +178,12 @@ def hash_pesos(modelo):
         resumo.update(nome.encode())
         resumo.update(tensor.detach().cpu().contiguous().numpy().tobytes())
     return resumo.hexdigest()
+
+
+def conferir_origem(pasta, volumes, exames):
+    for uid in exames:
+        with np.load(Path(pasta) / f"{uid}.npz", allow_pickle=False) as dados:
+            if "procedencia" not in dados:
+                raise ValueError(f"recortes sem procedencia: {uid}; execute a extracao atualizada")
+            if json.loads(str(dados["procedencia"])) != assinatura(Path(volumes) / f"{uid}.mha", (34, 34, 34)):
+                raise ValueError(f"recortes desatualizados: {uid}; execute a extracao novamente")

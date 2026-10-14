@@ -63,6 +63,11 @@ caminhos:
   cache_caracteristicas: "dados/intermediario/caracteristicas_cache"
   random_forest: "modelos/random_forest_v2"
   cnn_treino: "modelos/cnn_v2"
+  random_forest_validacao: "modelos/random_forest_v2_validacao"
+  comparacao_validacao: "relatorios/experimentos/comparacao_validacao"
+  diagnostico_random_forest: "relatorios/experimentos/diagnostico_random_forest"
+  random_forest_centro: "modelos/random_forest_centro"
+  caracteristicas_centro: "dados/intermediario/caracteristicas_centro"
 
 selecao:
   # Os dez subsets do desafio, que são as dobras oficiais de validação cruzada.
@@ -177,5 +182,72 @@ cnn:
   dropout_rate: 0.3
   weight_decay: 0.00001
   negativos_por_positivo: 5
-  device: cpu
+  device: cuda
   threads: 4
+
+# Variantes da CNN escolhidas só pela validação, uma mudança por vez sobre a melhor anterior.
+# Cada uma sobrescreve chaves de `cnn`. Ver docs/11-experimentos-validacao.md.
+# Random Forest com as mesmas estatísticas em cubos concêntricos do recorte, mesmos
+# hiperparâmetros de `random_forest`. Ver docs/11-experimentos-validacao.md.
+random_forest_centro:
+  lados: [8, 16, 34]
+  processos: 4
+
+experimentos_cnn:
+  epocas_40:
+    epochs: 40
+  aumento:
+    epochs: 40
+    aumento: true
+  negativos_20:
+    epochs: 40
+    aumento: true
+    negativos_por_positivo: 20
+  lr_3e-4:
+    epochs: 40
+    aumento: true
+    negativos_por_positivo: 20
+    learning_rate: 0.0003
+
+# Modelos comparados na validação pelo script 23. As diferenças pareadas de CPM são contra a
+# referência, nas mesmas reamostras por exame do avaliador oficial.
+comparacao:
+  referencia: cnn_v2
+  # Pares comparados entre si, além da referência: cada passo contra o anterior e a melhor
+  # rede contra o melhor modelo simples.
+  pares:
+    - [cnn_epocas_40, cnn_v2]
+    - [cnn_aumento, cnn_epocas_40]
+    - [cnn_negativos_20, cnn_aumento]
+    - [random_forest_centro, random_forest_v2]
+    - [cnn_lr_3e-4, cnn_negativos_20]
+    - [cnn_lr_3e-4, random_forest_centro]
+  modelos:
+    cnn_v2:
+      rotulo: "CNN3D v2"
+      avaliacao: modelos/cnn_v2
+      probabilidades: modelos/cnn_v2/probabilidades_validacao.csv
+    cnn_epocas_40:
+      rotulo: "CNN3D 40 épocas"
+      avaliacao: modelos/cnn_epocas_40
+      probabilidades: modelos/cnn_epocas_40/probabilidades_validacao.csv
+    cnn_aumento:
+      rotulo: "CNN3D 40 épocas + aumento"
+      avaliacao: modelos/cnn_aumento
+      probabilidades: modelos/cnn_aumento/probabilidades_validacao.csv
+    cnn_negativos_20:
+      rotulo: "CNN3D 40 épocas + aumento + 20 negativos"
+      avaliacao: modelos/cnn_negativos_20
+      probabilidades: modelos/cnn_negativos_20/probabilidades_validacao.csv
+    cnn_lr_3e-4:
+      rotulo: "CNN3D 40 épocas + aumento + 20 negativos + lr 3e-4"
+      avaliacao: modelos/cnn_lr_3e-4
+      probabilidades: modelos/cnn_lr_3e-4/probabilidades_validacao.csv
+    random_forest_v2:
+      rotulo: "Random Forest v2"
+      avaliacao: modelos/random_forest_v2_validacao
+      probabilidades: modelos/random_forest_v2/probabilidades_validacao.csv
+    random_forest_centro:
+      rotulo: "Random Forest centro"
+      avaliacao: modelos/random_forest_centro
+      probabilidades: modelos/random_forest_centro/probabilidades_validacao.csv

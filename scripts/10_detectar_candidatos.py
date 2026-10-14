@@ -255,7 +255,7 @@ if comparacao.exists():
     for linha in referencia.itertuples():
         print(f"  {linha.lista:>18}  {linha.teto:6.1%}")
 else:
-    print(f"\nrode scripts/08_comparar_candidatos.py para ter o teto das listas prontas ao lado")
+    print("\nrode scripts/08_comparar_candidatos.py para ter o teto das listas prontas ao lado")
 
 
 # Relatorios de cobertura da rodada completa, sem selecionar parametros pelo teste.

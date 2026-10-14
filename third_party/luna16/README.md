@@ -15,6 +15,10 @@ As tabelas de anotações continuam fora do Git.
   sensibilidade zero: nenhum acerto dividido pelo total de nódulos anotados.
   A mesma correção se aplica às reamostras de bootstrap sem acertos.
 
+O adaptador também salva o CPM de cada reamostra oficial e calcula seus quantis
+para o intervalo de confiança. Não substitui esse intervalo pela média dos limites
+dos pontos individuais da FROC.
+
 As distâncias físicas, as marcações excluídas, o limite oficial de
 100 marcas por exame e o bootstrap permanecem no programa original.
 Cada avaliação grava os SHA-256 dos arquivos originais e das cópias adaptadas,

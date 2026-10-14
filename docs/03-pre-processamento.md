@@ -120,7 +120,7 @@ O HU mediano dentro da máscara não está nesse relatório. Ele foi lido uma ve
 direto do volume bruto e da máscara do desafio no HD, nos cinco exames de maior fração de pulmão:
 deu -968, -328, -934, -929 e -917, contra -870, -866 e -884 em três exames de fração típica.
 
-## O que ainda não existe
+## Etapas seguintes
 
-O recorte dos cubos tem código e teste em `src/detection/patches.py`, e nunca rodou na base. Não
-existem as features de intensidade, o baseline, o modelo treinado nem a avaliação FROC.
+Este documento cobre o pré-processamento. Os recortes dos 888 exames foram conferidos em 06/10/2026
+(`docs/recortes_v2.md`), e features, modelos e avaliação estão em `docs/06` a `docs/12`.

@@ -77,3 +77,15 @@ def test_seriesuid_e_retomada_recriam_arquivo_invalido(tmp_path, monkeypatch):
     script.main()
     assert json.loads(resumo.read_text())["recriado"] == 1
     assert script.validar_arquivo(saida / f"{uid}.npz", pd.read_csv(lista), (34, 34, 34)) > 0
+
+    sitk.WriteImage(sitk.GetImageFromArray(np.full((40, 40, 40), 0.8, dtype=np.float32)),
+                    str(volumes / f"{uid}.mha"))
+    script.main()
+    assert json.loads(resumo.read_text())["recriado"] == 1
+    with np.load(saida / f"{uid}.npz") as dados:
+        assert dados["patches"][0, 17, 17, 17] == pytest.approx(0.8)
+
+    (volumes / f"{uid}.mha").unlink()
+    with pytest.raises(SystemExit):
+        script.main()
+    assert json.loads(resumo.read_text())["falhou"] == 1

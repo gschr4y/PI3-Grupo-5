@@ -1,159 +1,128 @@
-# Integração e reprodução da CNN
+# Preparação e treinamento da CNN
 
-Executado em **05/10/2026**. A integração, o rastreamento e a repetição funcionam
-em CPU. A avaliação abaixo é uma reprodução técnica em **seis exames reais**;
-o treinamento e a avaliação da CNN na divisão completa continuam pendentes.
+Integramos localmente o extrator, a CNN3D e o adaptador do avaliador oficial da
+PR #5. A rede tem três blocos convolucionais com 16, 32 e 64 canais. Não é uma
+ResNet. Mantivemos o primeiro Random Forest e seus artefatos.
 
-## Código e artefatos localizados
+## Ambiente
 
-`notebooks/curvafroc_pesquisa.ipynb` contém código Python exportado, apesar da
-extensão `.ipynb`. Nele encontramos a CNN, o treino, a inferência e os caminhos
-dos artefatos produzidos no Kaggle:
+Usamos ambientes separados para a CNN, sem modificar o ambiente do Random Forest.
+A extração dos recortes roda em `.venv-cnn`, com PyTorch para CPU:
 
-- `/kaggle/working/models/cnn3d_baseline.pt`: pesos.
-- `/kaggle/working/data/metadata/project_metadata.json`: métricas e configuração.
-- `/kaggle/working/results/`: figuras da pesquisa.
-
-Esses arquivos de saída antigos não foram encontrados na cópia local, no Drive
-do projeto ou nos branches remotos consultados. O arquivo de pesquisa também
-não contém saídas de células com resultados verificáveis. As previsões e
-métricas registradas nesta entrega foram **geradas novamente**, não recuperadas
-de uma execução antiga.
-
-O código efetivo é uma CNN3D com canais 16/32/64, BatchNorm, MaxPool, pooling
-adaptativo e duas camadas lineares. O nome `resnet18_3d` na configuração antiga
-não corresponde à implementação. As épocas efetivas eram 15, embora a
-configuração declarasse 100. Não havia augmentation ou early stopping em uso.
-
-`src/experimentos/cnn.py` preserva a arquitetura e os nomes do `state_dict`.
-O novo fluxo usa os recortes V2 de 34³ já produzidos pelo repositório, com crop
-central de 32³. Isso inclui a máscara pulmonar e o pré-processamento atual;
-portanto, não é uma reprodução idêntica do pré-processamento antigo do Kaggle.
-
-## Integração com o rastreamento existente
-
-O branch local `Lucas`, base `accb02c`, diverge do `main`. Conservamos os recortes
-locais e trouxemos de `main@7ec3da3` o módulo de MLflow, a divisão por paciente,
-os scripts de divisão/painel, a configuração e o registro do primeiro Random
-Forest. Não fizemos merge dos demais estágios do `main`.
-
-Cada execução da CNN guarda no MLflow:
-
-- Parâmetros efetivos, semente 42, device, versão do PyTorch e escopo.
-- SHA-256 da divisão, lista V2, anotações incluídas/excluídas e cada NPZ usado.
-- Versão dos dados agregada a partir desses hashes.
-- Commit base, estado local do Git, ZIP do código/configuração e ambiente instalado.
-- Pesos, candidatos de treino selecionados, histórico por época, divisão e previsões.
-- FROC oficial completa, limiares, análise de acertos/erros, figura, log e bootstrap.
-- Métricas de classificação por candidato, CPM e sensibilidades com IC por ponto.
-
-O banco fica em `dados/intermediario/mlflow/mlflow.db`; os artefatos, em
-`dados/intermediario/mlflow/artefatos`. Ambos devem ser preservados juntos.
-O banco local desta máquina é novo; o run anterior do Random Forest está
-documentado no registro do modelo, mas seus artefatos não foram copiados para cá.
-
-`requirements-cnn.lock.txt` registra o ambiente executado: Python 3.14.6,
-Windows x64 e PyTorch 2.14.0+cpu. O lock é específico desse ambiente.
-
-## Protocolo da reprodução técnica
-
-A população está congelada em `configuracao/cnn_reproducao_exames.csv`: dois
-exames do subset 0 para treino, dois do 7 para validação e dois do 8 para teste.
-A seleção inicial usou os dois menores NPZ com nódulo anotado de cada subset,
-antes de calcular escores. Ela é intencionalmente pequena e não representativa.
-
-O mapa completo de pacientes não estava disponível nesta máquina. Nesta amostra
-restrita usamos aliases por exame, apoiados na medição da decisão 0003: o único
-paciente com duas séries está nos subsets 2/6, ausentes da amostra. Para uma
-rodada completa, usar o mapa real e `scripts/13_criar_divisao.py`.
-
-O treino usa todos os positivos e até cinco negativos por positivo, somente
-nos exames de treino. O sampler ponderado amostra com reposição. Validação e
-teste recebem **todos** os seus candidatos, sem balanceamento nem limiar prévio.
-O teste é lido após o treinamento, sem acompanhamento por época ou escolha
-de checkpoint. As 15 épocas e os demais parâmetros são fixos.
-
-| Partição | Exames | Candidatos usados | Positivos V2 | Nódulos incluídos na avaliação |
-|---|---:|---:|---:|---:|
-| Treino | 2 | 18 | 3 | — |
-| Validação | 2 | 1.092 | 7 | 5 |
-| Teste | 2 | 1.032 | 9 | 4 |
-
-O número de candidatos positivos não é o número de nódulos: vários candidatos
-podem corresponder ao mesmo nódulo.
-
-## Avaliação e resultado
-
-Executamos o programa do pacote oficial LUNA16 em `third_party/luna16`, com
-anotações incluídas/excluídas, lista de exames e CSV de coordenadas/probabilidade.
-O próprio programa aplica o limite de 100 marcas por exame. Mantivemos os
-originais e registramos os hashes das cópias adaptadas para Python 3.
-
-Além da compatibilidade de sintaxe/CSV/Matplotlib, corrigimos um caso de borda:
-o sklearn produz TPR `NaN` quando nenhum positivo foi detectado. Nessa condição,
-o adaptador usa sensibilidade zero, preservando os nódulos perdidos no
-denominador. A correção também vale para reamostras sem acertos e tem teste
-específico. As tentativas anteriores com erro/NaN ficaram como `FAILED` no MLflow.
-
-| Métrica | Validação | Teste |
-|---|---:|---:|
-| CPM, média dos sete pontos oficiais | 0,000 | 0,000 |
-| Sensibilidade a 1 FP/exame | 0,000 | 0,000 |
-| Sensibilidade a 4 FP/exame | 0,000 | 0,000 |
-| IC 95% bootstrap a 4 FP/exame | [0,000; 0,000] | [0,000; 0,000] |
-| Nódulos detectados entre as marcas retidas | 0/5 | 0/4 |
-
-Foram 1.000 reamostras por exame, com semente 42. O IC degenerado desta amostra
-minúscula não prova sensibilidade zero na população. O modelo não atende à
-meta de 0,80 a 4 FP/exame; esta rodada comprova o funcionamento do fluxo.
-
-Resultados agregados versionados em
-[`relatorios/experimentos/cnn_reproducao`](../relatorios/experimentos/cnn_reproducao/):
-curvas pontuais completas, curvas de bootstrap com **10.000 pontos cada**,
-sete pontos de operação, análises e recibos. Previsões completas e pesos ficam
-nas pastas dos modelos e nos artefatos do MLflow, fora do Git.
-
-## Repetição conferida
-
-Primeiro run válido: `594440921c0c448cbf9b6e431861b68a`.
-Repetição: `539fe19dfd0547529bc951b290457284`.
-
-As duas execuções produziram pesos tensoriais idênticos, com SHA-256
-`fba14f68492bae989ff6b25b2f082828ded9dbc117f5f4de994ffc7e9d3f4bb4`.
-Os CSVs de probabilidades, curvas FROC e curvas de bootstrap da validação e do
-teste também são idênticos byte a byte. `--reproduzir-de` recusa divergências.
-O arquivo `.pt` contém o run ID e pode ter hash de arquivo diferente; a comparação
-dos pesos usa os nomes e os bytes dos tensores, sem metadados variáveis.
-
-Versão dos dados:
-`eb7b84a6e51f994464d3b4b31b726340fd81333ca143bb9bb0a302d480b7b36d`.
-
-## Comandos
-
-Na raiz do repositório, em PowerShell e com o ambiente disponível:
-
-```powershell
-# Preparar em outra máquina. A pasta de saída deve ser nova.
-.venv/Scripts/python.exe scripts/19_preparar_reproducao_cnn.py --dataset "G:\Meu Drive\PI3-Grupo-5\Dataset"
-
-.venv/Scripts/python.exe scripts/18_treinar_cnn.py --dados dados/processado/cnn_reproducao --escopo reproducao_tecnica_6_exames --saida modelos/cnn3d_nova_execucao
-
-.venv/Scripts/python.exe scripts/18_treinar_cnn.py --dados dados/processado/cnn_reproducao --escopo reproducao_tecnica_6_exames --saida modelos/cnn3d_nova_repeticao --reproduzir-de modelos/cnn3d_nova_execucao
-
-.venv/Scripts/python.exe scripts/16_abrir_mlflow.py
-.venv/Scripts/python.exe -m pytest -q
-.venv/Scripts/python.exe -m pip check
+```bash
+python3 -m venv .venv-cnn
+.venv-cnn/bin/python -m pip install --extra-index-url https://download.pytorch.org/whl/cpu -r requirements-cnn-cpu.lock.txt
+.venv-cnn/bin/python -m pip check
 ```
 
-No Linux, substituir `.venv/Scripts/python.exe` por `.venv/bin/python`.
-As execuções existentes são preservadas: cada `--saida` precisa ser uma pasta nova.
+O treino roda em `.venv-cnn-gpu`, com PyTorch para CUDA 13.0, desde 12/10/2026
+(decisão 0007). As outras versões são as mesmas do lock de CPU.
 
-Para a divisão completa, ajustar os caminhos externos do YAML, gerar a divisão
-com o mapa real e executar o script 18 **sem `--dados`**, apontando `--saida`
-para uma nova pasta. O script 18 ainda não é um estágio do DVC.
+```bash
+python3 -m venv .venv-cnn-gpu
+.venv-cnn-gpu/bin/python -m pip install --extra-index-url https://download.pytorch.org/whl/cu130 -r requirements-cnn-gpu.lock.txt
+.venv-cnn-gpu/bin/python -m pip check
+```
 
-Validação desta entrega: **60 testes passaram, 17 foram ignorados** por dependerem
-de arquivos externos ausentes nos caminhos configurados; `pip check` passou.
-Há testes de vazamento por paciente, identidade/coordenadas dos candidatos,
-amostragem só no treino, inferência completa, checkpoint e contagem oficial
-de nódulos perdidos/marcações excluídas. A repetição real foi conferida à parte.
+Sem GPU, `cnn.device: cpu` no YAML faz o mesmo ambiente treinar na CPU.
+`requirements-cnn.lock.txt` continua sendo o registro do ambiente original do Lucas.
+
+## Recortes e procedência
+
+O extrator lê os caminhos do YAML. Cada NPZ contém IDs, coordenadas, classes,
+cubos e procedência: SHA-256 do volume e dos arquivos do extrator, além do tamanho.
+A retomada confere essa procedência antes de reutilizar o arquivo. Recortes antigos
+sem procedência são recriados; um volume ausente é uma falha, mesmo que exista NPZ.
+O treino também recusa recortes cuja origem não corresponda aos volumes atuais.
+
+```bash
+.venv/bin/dvc repro patches
+```
+
+Esse comando gera o lote completo em `dados/processado/patches`, fora do Git.
+Na conferência de 06/10/2026, o lote completo terminou com 888 arquivos válidos,
+754.975 recortes e nenhuma falha. O resumo em `dados/intermediario/resumo_patches.json`
+registra 39.690.009.514 bytes e 5.444,36 segundos de extração. O DVC atualizou
+o lock.
+
+## Treino de desenvolvimento
+
+```bash
+.venv/bin/dvc repro treinar_cnn
+```
+
+O DVC encadeia divisão, recortes e treinamento. A CNN usa todos os candidatos
+positivos de treino e até cinco negativos por positivo, com amostragem ponderada.
+A validação mantém todos os seus candidatos. Os parâmetros ficam em `cnn` no YAML.
+O treino salva os pesos, as probabilidades e a FROC da validação no MLflow e na
+pasta `caminhos.cnn_treino`. O teste não é lido nem avaliado por esse comando.
+
+Uma nova configuração deve usar uma nova pasta `caminhos.cnn_treino`. O script
+recusa sobrescrever execuções existentes. O histórico de cada execução fica
+preservado nos artefatos do MLflow.
+
+## Primeiro treino completo, 12/10/2026
+
+Executamos `.venv/bin/dvc repro treinar_cnn` com a configuração do YAML: 15 épocas,
+batch 32, learning rate 0,0001, dropout 0,3, weight decay 0,00001, cinco negativos
+por positivo e semente 42, na RTX 4050 (decisão 0007). O DVC pulou inventário, base,
+divisão e recortes. O run `4f52dc350af44d099574a26ac1567731` terminou como `FINISHED`,
+com `teste_utilizado=false`. Saída em `modelos/cnn_v2`, log local em
+`_local/cnn/treino-cnn-v2.log`.
+
+O treino usou 6.588 candidatos V2, 1.098 positivos, de 623 exames. A loss de treino
+caiu de 0,659 na época 1 para 0,404 na época 15 (`modelos/cnn_v2/historico.csv`).
+O treino levou 565,9 segundos e o `dvc repro` inteiro, 13 min 17 s.
+
+A validação tem 89 exames, 75.063 candidatos e 111 nódulos. O avaliador oficial,
+com 1.000 reamostras por exame, mediu esta curva
+(`modelos/cnn_v2/avaliacao_validacao/pontos_operacao.csv`):
+
+| FP por exame | Sensibilidade | IC95% |
+|---|---|---|
+| 0,125 | 0,054 | 0,000 a 0,124 |
+| 0,25 | 0,090 | 0,039 a 0,233 |
+| 0,5 | 0,225 | 0,127 a 0,306 |
+| 1 | 0,270 | 0,175 a 0,367 |
+| 2 | 0,333 | 0,235 a 0,452 |
+| 4 | 0,405 | 0,306 a 0,525 |
+| 8 | 0,495 | 0,386 a 0,611 |
+
+O CPM foi 0,268, com IC95% de 0,198 a 0,358. O avaliador considera no máximo 100
+candidatos por exame. Dentro desse limite, 90 dos 111 nódulos receberam algum
+candidato e 21 ficaram sem nenhum, o que põe a sensibilidade máxima da curva em
+0,811 (`avaliacao_validacao/CADAnalysis.txt`). O teste não foi lido.
+
+## Avaliação final, somente após congelar o modelo
+
+```bash
+.venv-cnn/bin/python scripts/20_avaliar_teste_cnn.py --modelo modelos/cnn_v2/modelo.pt --saida modelos/cnn_v2_teste_final
+```
+
+Esse comando não treina. Ele verifica os hashes da divisão e da lista V2 contra
+os registrados no checkpoint. Em seguida, confere os recortes de teste e executa
+a avaliação oficial, em uma execução separada do MLflow. Não foi executado na
+base real nesta preparação.
+
+O adaptador usa os arquivos oficiais e registra as adaptações para Python 3.
+Preserva a contagem de nódulos perdidos e as marcações excluídas. Além dos intervalos
+por ponto da FROC, calcula o intervalo do CPM nas mesmas reamostras por exame.
+Não usa média dos limites dos intervalos por ponto para obter o intervalo do CPM.
+
+## Verificação técnica em 05/10/2026
+
+Executamos `scripts/19_preparar_reproducao_cnn.py --saida dados/processado/cnn_verificacao_4_exames`.
+A amostra contém dois exames de treino e dois de validação, com pacientes obtidos
+do mapa real. O script recria os recortes com a procedência atual e não seleciona
+exames do teste. Essa amostra serve para conferir o código, não para escolher o modelo.
+
+Executamos o script 18 com `--dados dados/processado/cnn_verificacao_4_exames`, uma
+configuração técnica de uma época e dois threads, e saída em
+`modelos/cnn_verificacao_4_exames`. O run
+`9002b29b2f0d4c06a1388e8bd300baf1` produziu pesos, probabilidades e avaliação de
+validação, com CPM 0. O resultado não estima o desempenho da CNN na divisão completa.
+O YAML efetivamente usado foi incluído na procedência do MLflow.
+
+Os relatórios em `relatorios/experimentos/cnn_reproducao` registram o ensaio
+original do Lucas com seis exames, incluindo dois do subset 8. São históricos;
+não correspondem ao novo comando de treino nem à avaliação final do projeto.

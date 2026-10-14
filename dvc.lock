@@ -82,8 +82,8 @@ stages:
       size: 170759
     - path: scripts/04_preprocessar.py
       hash: md5
-      md5: 4640c005bfeec1704daebebc61e6ee89
-      size: 3090
+      md5: bab6be1e0eebf302ca31994544e8294c
+      size: 3071
     - path: src/config.py
       hash: md5
       md5: 8167e0210942c88a2baaec8b50216f0f
@@ -109,7 +109,7 @@ stages:
         pre_processamento.hu_max: 400
         pre_processamento.hu_min: -1000
     outs:
-    - path:
+    - path: 
         dados/processado/1.3.6.1.4.1.14519.5.2.1.6279.6001.287966244644280690737019247886.mha
       hash: md5
       md5: 476dd0768810c9c43c75105c9f7c5a39
@@ -139,8 +139,8 @@ stages:
       size: 3279
     - path: src/visualization/eda.py
       hash: md5
-      md5: 647c00d5f82ab021e4cad15229bda3f7
-      size: 5897
+      md5: 9976d57fee7345bee07c22234d686994
+      size: 5878
     params:
       configuracao/config.yaml:
         candidatos.patch:
@@ -211,8 +211,8 @@ stages:
       size: 1898
     - path: src/visualization/eda.py
       hash: md5
-      md5: 647c00d5f82ab021e4cad15229bda3f7
-      size: 5897
+      md5: 9976d57fee7345bee07c22234d686994
+      size: 5878
     params:
       configuracao/config.yaml:
         candidatos.patch:
@@ -346,7 +346,7 @@ stages:
         evidencia_normalizacao.faixa_pulmonar:
         - -1000
         - -400
-        evidencia_normalizacao.seriesuid:
+        evidencia_normalizacao.seriesuid: 
           1.3.6.1.4.1.14519.5.2.1.6279.6001.979083010707182900091062408058
         pre_processamento.hu_max: 400
         pre_processamento.hu_min: -1000
@@ -388,8 +388,8 @@ stages:
       size: 1306
     - path: src/dataset/divisao.py
       hash: md5
-      md5: da3c2dbba5432298b7532dd635561983
-      size: 1934
+      md5: 1658b25816c13361aa8a095ea818c7a6
+      size: 1912
     params:
       configuracao/config.yaml:
         divisao:
@@ -456,8 +456,8 @@ stages:
       size: 2837
     - path: scripts/10_detectar_candidatos.py
       hash: md5
-      md5: 059c980f6868573d6c01ff8d7ed18430
-      size: 12958
+      md5: b48b464a26cd390e3f46c6860ef30926
+      size: 12957
     - path: src/config.py
       hash: md5
       md5: 8167e0210942c88a2baaec8b50216f0f
@@ -628,7 +628,7 @@ stages:
       size: 169261
       nfiles: 120
   features@treino:
-    cmd: .venv/bin/python scripts/14_extrair_caracteristicas.py --particao
+    cmd: .venv/bin/python scripts/14_extrair_caracteristicas.py --particao 
       treino
     deps:
     - path: /media/kauan/HD Samuel/luna/archive/candidates_V2/candidates_V2.csv
@@ -659,8 +659,8 @@ stages:
       size: 1306
     - path: src/detection/features.py
       hash: md5
-      md5: 81f95727eece1e7ce7913e361f078c02
-      size: 4038
+      md5: ff81969a56418ed5eff395a2a2e5ea5e
+      size: 6288
     - path: src/detection/patches.py
       hash: md5
       md5: 1c214aac71fac81a40c221acaa20b193
@@ -691,7 +691,7 @@ stages:
       md5: 59e1208efbec45181cb19bbeab25d50a
       size: 15
   features@validacao:
-    cmd: .venv/bin/python scripts/14_extrair_caracteristicas.py --particao
+    cmd: .venv/bin/python scripts/14_extrair_caracteristicas.py --particao 
       validacao
     deps:
     - path: /media/kauan/HD Samuel/luna/archive/candidates_V2/candidates_V2.csv
@@ -722,8 +722,8 @@ stages:
       size: 1306
     - path: src/detection/features.py
       hash: md5
-      md5: 81f95727eece1e7ce7913e361f078c02
-      size: 4038
+      md5: ff81969a56418ed5eff395a2a2e5ea5e
+      size: 6288
     - path: src/detection/patches.py
       hash: md5
       md5: 1c214aac71fac81a40c221acaa20b193
@@ -803,16 +803,16 @@ stages:
       size: 1306
     - path: src/detection/features.py
       hash: md5
-      md5: 81f95727eece1e7ce7913e361f078c02
-      size: 4038
+      md5: ff81969a56418ed5eff395a2a2e5ea5e
+      size: 6288
     - path: src/experimentos/preparacao.py
       hash: md5
       md5: afb7e89eb6a672b40f0be5e25ca07cec
       size: 3116
     - path: src/experimentos/rastreamento.py
       hash: md5
-      md5: f38a6e59e00a3e90d8882dbe400e53c5
-      size: 3739
+      md5: 72b8755426f29772941e630fbd758134
+      size: 3844
     params:
       configuracao/config.yaml:
         candidatos.patch:
@@ -876,8 +876,8 @@ stages:
       size: 1306
     - path: src/detection/features.py
       hash: md5
-      md5: 81f95727eece1e7ce7913e361f078c02
-      size: 4038
+      md5: ff81969a56418ed5eff395a2a2e5ea5e
+      size: 6288
     - path: src/experimentos/floresta.py
       hash: md5
       md5: c61fadb404500e4a136c8de6db3420f3
@@ -888,8 +888,8 @@ stages:
       size: 3116
     - path: src/experimentos/rastreamento.py
       hash: md5
-      md5: f38a6e59e00a3e90d8882dbe400e53c5
-      size: 3739
+      md5: 72b8755426f29772941e630fbd758134
+      size: 3844
     params:
       configuracao/config.yaml:
         caminhos.random_forest: modelos/random_forest_v2
@@ -921,7 +921,7 @@ stages:
       md5: eaef417c9e202327405f838f0e8bf7ac
       size: 72058556
       isexec: true
-    - path: /media/kauan/HD
+    - path: /media/kauan/HD 
         Samuel/luna/archive/evaluationScript/evaluationScript/annotations/annotations_excluded.csv
       hash: md5
       md5: cc20913a2f1a44e183958e7e2154ddfd
@@ -956,3 +956,978 @@ stages:
       hash: md5
       md5: b2b5e2d9020bc4f3113efffa7e8458e2
       size: 265
+  patches:
+    cmd: .venv-cnn/bin/python scripts/09_extrair_patches.py
+    deps:
+    - path: /media/kauan/HD Samuel/luna/archive/candidates_V2/candidates_V2.csv
+      hash: md5
+      md5: eaef417c9e202327405f838f0e8bf7ac
+      size: 72058556
+      isexec: true
+    - path: dados/processado/volumes
+      hash: md5
+      md5: 7c5c8025a80d44a1b39b31cd341c15c6.dir
+      size: 9206037290
+      nfiles: 888
+    - path: requirements-cnn-cpu.lock.txt
+      hash: md5
+      md5: 4f1afcc10515597797d27f9cdca414b4
+      size: 2883
+    - path: scripts/09_extrair_patches.py
+      hash: md5
+      md5: fe796ccf02a4abfce274655020b2d52d
+      size: 9140
+    - path: src/config.py
+      hash: md5
+      md5: 8167e0210942c88a2baaec8b50216f0f
+      size: 1306
+    - path: src/detection/patches.py
+      hash: md5
+      md5: 1c214aac71fac81a40c221acaa20b193
+      size: 1244
+    - path: src/detection/procedencia_recortes.py
+      hash: md5
+      md5: 9cb09ce74a160751fb15b479a12eaef6
+      size: 685
+    params:
+      configuracao/config.yaml:
+        caminhos.intermediario: dados/intermediario
+        caminhos.processado: dados/processado
+        caminhos.volumes: dados/processado/volumes
+        candidatos.patch:
+        - 34
+        - 34
+        - 34
+    outs:
+    - path: dados/intermediario/falhas_patches.csv
+      hash: md5
+      md5: 59e1208efbec45181cb19bbeab25d50a
+      size: 15
+    - path: dados/intermediario/resumo_patches.json
+      hash: md5
+      md5: 800ba1533b748be5d978ca0657cbc414
+      size: 354
+    - path: dados/processado/patches
+      hash: md5
+      md5: 05240b5e98282f4d2084028d7a4cc9d2.dir
+      size: 39690009514
+      nfiles: 888
+  treinar_cnn:
+    cmd: .venv-cnn-gpu/bin/python scripts/18_treinar_cnn.py --saida 
+      modelos/cnn_v2
+    deps:
+    - path: /media/kauan/HD Samuel/luna/archive/annotations.csv
+      hash: md5
+      md5: f4404df491aee6445a4485061bfdffdd
+      size: 136986
+      isexec: true
+    - path: /media/kauan/HD Samuel/luna/archive/candidates_V2/candidates_V2.csv
+      hash: md5
+      md5: eaef417c9e202327405f838f0e8bf7ac
+      size: 72058556
+      isexec: true
+    - path: /media/kauan/HD 
+        Samuel/luna/archive/evaluationScript/evaluationScript/annotations/annotations_excluded.csv
+      hash: md5
+      md5: cc20913a2f1a44e183958e7e2154ddfd
+      size: 3534875
+      isexec: true
+    - path: dados/processado/divisao.csv
+      hash: md5
+      md5: 5dd7faea5aa4de0bc721c9c1e082674b
+      size: 79158
+    - path: dados/processado/patches
+      hash: md5
+      md5: 05240b5e98282f4d2084028d7a4cc9d2.dir
+      size: 39690009514
+      nfiles: 888
+    - path: dados/processado/volumes
+      hash: md5
+      md5: 7c5c8025a80d44a1b39b31cd341c15c6.dir
+      size: 9206037290
+      nfiles: 888
+    - path: notebooks/curvafroc_pesquisa.ipynb
+      hash: md5
+      md5: 42e60c4421de33a1ff3a2819dcaccb86
+      size: 55649
+    - path: requirements-cnn-gpu.lock.txt
+      hash: md5
+      md5: 014c3ee03fb37fa1b3d8f93b8993f01b
+      size: 3358
+    - path: scripts/09_extrair_patches.py
+      hash: md5
+      md5: fe796ccf02a4abfce274655020b2d52d
+      size: 9140
+    - path: scripts/18_treinar_cnn.py
+      hash: md5
+      md5: c385f609efff8f496340c9437a9826a8
+      size: 10698
+    - path: src/config.py
+      hash: md5
+      md5: 8167e0210942c88a2baaec8b50216f0f
+      size: 1306
+    - path: src/detection/patches.py
+      hash: md5
+      md5: 1c214aac71fac81a40c221acaa20b193
+      size: 1244
+    - path: src/detection/procedencia_recortes.py
+      hash: md5
+      md5: 9cb09ce74a160751fb15b479a12eaef6
+      size: 685
+    - path: src/experimentos/avaliacao_oficial.py
+      hash: md5
+      md5: 3a29c75b3f2ea6da17a78eeece81c2af
+      size: 6667
+    - path: src/experimentos/cnn.py
+      hash: md5
+      md5: 797a31aacc73307f1ea0141bb7a97b75
+      size: 9102
+    - path: src/experimentos/rastreamento.py
+      hash: md5
+      md5: 72b8755426f29772941e630fbd758134
+      size: 3844
+    - path: third_party/luna16
+      hash: md5
+      md5: 421c13dc2e3b9f168cb523fb3647c82e.dir
+      size: 24962
+      nfiles: 5
+    params:
+      configuracao/config.yaml:
+        avaliacao:
+          pontos_fp_por_exame:
+          - 0.125
+          - 0.25
+          - 0.5
+          - 1
+          - 2
+          - 4
+          - 8
+          pontos_de_operacao:
+          - 1
+          - 4
+          bootstrap_reamostras: 1000
+          intervalo_confianca: 0.95
+        caminhos.cnn_treino: modelos/cnn_v2
+        cnn:
+          patch_size: 32
+          batch_size: 32
+          learning_rate: 0.0001
+          epochs: 15
+          dropout_rate: 0.3
+          weight_decay: 1e-05
+          negativos_por_positivo: 5
+          device: cuda
+          threads: 4
+        rastreamento.experimento: PI3-Grupo-5
+        seed: 42
+    outs:
+    - path: modelos/cnn_v2
+      hash: md5
+      md5: 6eb3705fd1cbb19d0c99c457a0b38f4e.dir
+      size: 18108523
+      nfiles: 19
+  avaliar_random_forest:
+    cmd: .venv/bin/python scripts/22_avaliar_random_forest.py
+    deps:
+    - path: /media/kauan/HD Samuel/luna/archive/annotations.csv
+      hash: md5
+      md5: f4404df491aee6445a4485061bfdffdd
+      size: 136986
+      isexec: true
+    - path: /media/kauan/HD Samuel/luna/archive/candidates_V2/candidates_V2.csv
+      hash: md5
+      md5: eaef417c9e202327405f838f0e8bf7ac
+      size: 72058556
+      isexec: true
+    - path: /media/kauan/HD 
+        Samuel/luna/archive/evaluationScript/evaluationScript/annotations/annotations_excluded.csv
+      hash: md5
+      md5: cc20913a2f1a44e183958e7e2154ddfd
+      size: 3534875
+      isexec: true
+    - path: dados/processado/divisao.csv
+      hash: md5
+      md5: 5dd7faea5aa4de0bc721c9c1e082674b
+      size: 79158
+    - path: modelos/random_forest_v2
+      hash: md5
+      md5: 5eb8783c961efd609e347bccd88c2575.dir
+      size: 25830356
+      nfiles: 3
+    - path: requirements-rastreamento.lock.txt
+      hash: md5
+      md5: 2d947512d861bd4971f6accc420639e3
+      size: 2837
+    - path: scripts/22_avaliar_random_forest.py
+      hash: md5
+      md5: d9a64374f19a51c5b3e8f695e9d7c941
+      size: 4355
+    - path: src/config.py
+      hash: md5
+      md5: 8167e0210942c88a2baaec8b50216f0f
+      size: 1306
+    - path: src/experimentos/avaliacao_oficial.py
+      hash: md5
+      md5: 3a29c75b3f2ea6da17a78eeece81c2af
+      size: 6667
+    - path: src/experimentos/rastreamento.py
+      hash: md5
+      md5: 72b8755426f29772941e630fbd758134
+      size: 3844
+    - path: third_party/luna16
+      hash: md5
+      md5: 421c13dc2e3b9f168cb523fb3647c82e.dir
+      size: 24962
+      nfiles: 5
+    params:
+      configuracao/config.yaml:
+        avaliacao:
+          pontos_fp_por_exame:
+          - 0.125
+          - 0.25
+          - 0.5
+          - 1
+          - 2
+          - 4
+          - 8
+          pontos_de_operacao:
+          - 1
+          - 4
+          bootstrap_reamostras: 1000
+          intervalo_confianca: 0.95
+        caminhos.random_forest_validacao: modelos/random_forest_v2_validacao
+        rastreamento.experimento: PI3-Grupo-5
+        seed: 42
+    outs:
+    - path: modelos/random_forest_v2_validacao
+      hash: md5
+      md5: 0223f431f13b9285a78c9f04b1cbdfea.dir
+      size: 9128944
+      nfiles: 14
+  comparar_validacao:
+    cmd: .venv/bin/python scripts/23_comparar_validacao.py
+    deps:
+    - path: /media/kauan/HD Samuel/luna/archive/candidates_V2/candidates_V2.csv
+      hash: md5
+      md5: eaef417c9e202327405f838f0e8bf7ac
+      size: 72058556
+      isexec: true
+    - path: modelos/cnn_aumento
+      hash: md5
+      md5: ee70cbfad15fd318e28183d540c32943.dir
+      size: 18152640
+      nfiles: 19
+    - path: modelos/cnn_epocas_40
+      hash: md5
+      md5: 023df06bb7a9570704e7b26ad8a8757c.dir
+      size: 18151749
+      nfiles: 19
+    - path: modelos/cnn_lr_3e-4
+      hash: md5
+      md5: b2bd43f242b9b14bbbc22f6de7746ad1.dir
+      size: 20016256
+      nfiles: 19
+    - path: modelos/cnn_negativos_20
+      hash: md5
+      md5: 437b01e54109f63a610b821d41cf178d.dir
+      size: 19841370
+      nfiles: 19
+    - path: modelos/cnn_v2
+      hash: md5
+      md5: 6eb3705fd1cbb19d0c99c457a0b38f4e.dir
+      size: 18108523
+      nfiles: 19
+    - path: modelos/random_forest_centro
+      hash: md5
+      md5: db843473c314bbcc40859c446242a161.dir
+      size: 30482460
+      nfiles: 16
+    - path: modelos/random_forest_v2
+      hash: md5
+      md5: 5eb8783c961efd609e347bccd88c2575.dir
+      size: 25830356
+      nfiles: 3
+    - path: modelos/random_forest_v2_validacao
+      hash: md5
+      md5: 0223f431f13b9285a78c9f04b1cbdfea.dir
+      size: 9128944
+      nfiles: 14
+    - path: scripts/23_comparar_validacao.py
+      hash: md5
+      md5: ac95f515fe6915b0dd792969aa18dd2b
+      size: 7536
+    - path: src/config.py
+      hash: md5
+      md5: 8167e0210942c88a2baaec8b50216f0f
+      size: 1306
+    params:
+      configuracao/config.yaml:
+        avaliacao.intervalo_confianca: 0.95
+        caminhos.comparacao_validacao: 
+          relatorios/experimentos/comparacao_validacao
+        comparacao:
+          referencia: cnn_v2
+          pares:
+          - - cnn_epocas_40
+            - cnn_v2
+          - - cnn_aumento
+            - cnn_epocas_40
+          - - cnn_negativos_20
+            - cnn_aumento
+          - - random_forest_centro
+            - random_forest_v2
+          - - cnn_lr_3e-4
+            - cnn_negativos_20
+          - - cnn_lr_3e-4
+            - random_forest_centro
+          modelos:
+            cnn_v2:
+              rotulo: CNN3D v2
+              avaliacao: modelos/cnn_v2
+              probabilidades: modelos/cnn_v2/probabilidades_validacao.csv
+            cnn_epocas_40:
+              rotulo: CNN3D 40 épocas
+              avaliacao: modelos/cnn_epocas_40
+              probabilidades: modelos/cnn_epocas_40/probabilidades_validacao.csv
+            cnn_aumento:
+              rotulo: CNN3D 40 épocas + aumento
+              avaliacao: modelos/cnn_aumento
+              probabilidades: modelos/cnn_aumento/probabilidades_validacao.csv
+            cnn_negativos_20:
+              rotulo: CNN3D 40 épocas + aumento + 20 negativos
+              avaliacao: modelos/cnn_negativos_20
+              probabilidades: 
+                modelos/cnn_negativos_20/probabilidades_validacao.csv
+            cnn_lr_3e-4:
+              rotulo: CNN3D 40 épocas + aumento + 20 negativos + lr 3e-4
+              avaliacao: modelos/cnn_lr_3e-4
+              probabilidades: modelos/cnn_lr_3e-4/probabilidades_validacao.csv
+            random_forest_v2:
+              rotulo: Random Forest v2
+              avaliacao: modelos/random_forest_v2_validacao
+              probabilidades: 
+                modelos/random_forest_v2/probabilidades_validacao.csv
+            random_forest_centro:
+              rotulo: Random Forest centro
+              avaliacao: modelos/random_forest_centro
+              probabilidades: 
+                modelos/random_forest_centro/probabilidades_validacao.csv
+        seed: 42
+    outs:
+    - path: relatorios/experimentos/comparacao_validacao
+      hash: md5
+      md5: 6995fa6172554744f9fb314fc8b68633.dir
+      size: 138526
+      nfiles: 5
+  diagnosticar_random_forest:
+    cmd: .venv/bin/python scripts/24_diagnosticar_random_forest.py
+    deps:
+    - path: dados/intermediario/caracteristicas_treino.csv
+      hash: md5
+      md5: f52d11b0947f3fa448cc850112d9213b
+      size: 126990027
+    - path: dados/intermediario/caracteristicas_validacao.csv
+      hash: md5
+      md5: 9594f9cc8bc7f6a9a4853b82f75ec8b4
+      size: 18255767
+    - path: dados/processado/patches
+      hash: md5
+      md5: 05240b5e98282f4d2084028d7a4cc9d2.dir
+      size: 39690009514
+      nfiles: 888
+    - path: modelos/random_forest_v2
+      hash: md5
+      md5: 5eb8783c961efd609e347bccd88c2575.dir
+      size: 25830356
+      nfiles: 3
+    - path: scripts/24_diagnosticar_random_forest.py
+      hash: md5
+      md5: 3e54c09d25994ced86bfc56055b8af09
+      size: 2757
+    - path: src/config.py
+      hash: md5
+      md5: 8167e0210942c88a2baaec8b50216f0f
+      size: 1306
+    - path: src/detection/features.py
+      hash: md5
+      md5: ff81969a56418ed5eff395a2a2e5ea5e
+      size: 6288
+    params:
+      configuracao/config.yaml:
+        caminhos.diagnostico_random_forest: 
+          relatorios/experimentos/diagnostico_random_forest
+        seed: 42
+    outs:
+    - path: relatorios/experimentos/diagnostico_random_forest
+      hash: md5
+      md5: d52a9dd81050bdd32d3e050aee86f175.dir
+      size: 831
+      nfiles: 1
+  treinar_cnn_variante@epocas_40:
+    cmd: .venv-cnn-gpu/bin/python scripts/18_treinar_cnn.py --variante epocas_40
+      --saida modelos/cnn_epocas_40
+    deps:
+    - path: /media/kauan/HD Samuel/luna/archive/annotations.csv
+      hash: md5
+      md5: f4404df491aee6445a4485061bfdffdd
+      size: 136986
+      isexec: true
+    - path: /media/kauan/HD Samuel/luna/archive/candidates_V2/candidates_V2.csv
+      hash: md5
+      md5: eaef417c9e202327405f838f0e8bf7ac
+      size: 72058556
+      isexec: true
+    - path: /media/kauan/HD 
+        Samuel/luna/archive/evaluationScript/evaluationScript/annotations/annotations_excluded.csv
+      hash: md5
+      md5: cc20913a2f1a44e183958e7e2154ddfd
+      size: 3534875
+      isexec: true
+    - path: dados/processado/divisao.csv
+      hash: md5
+      md5: 5dd7faea5aa4de0bc721c9c1e082674b
+      size: 79158
+    - path: dados/processado/patches
+      hash: md5
+      md5: 05240b5e98282f4d2084028d7a4cc9d2.dir
+      size: 39690009514
+      nfiles: 888
+    - path: dados/processado/volumes
+      hash: md5
+      md5: 7c5c8025a80d44a1b39b31cd341c15c6.dir
+      size: 9206037290
+      nfiles: 888
+    - path: notebooks/curvafroc_pesquisa.ipynb
+      hash: md5
+      md5: 42e60c4421de33a1ff3a2819dcaccb86
+      size: 55649
+    - path: requirements-cnn-gpu.lock.txt
+      hash: md5
+      md5: 014c3ee03fb37fa1b3d8f93b8993f01b
+      size: 3358
+    - path: scripts/09_extrair_patches.py
+      hash: md5
+      md5: fe796ccf02a4abfce274655020b2d52d
+      size: 9140
+    - path: scripts/18_treinar_cnn.py
+      hash: md5
+      md5: c385f609efff8f496340c9437a9826a8
+      size: 10698
+    - path: src/config.py
+      hash: md5
+      md5: 8167e0210942c88a2baaec8b50216f0f
+      size: 1306
+    - path: src/detection/patches.py
+      hash: md5
+      md5: 1c214aac71fac81a40c221acaa20b193
+      size: 1244
+    - path: src/detection/procedencia_recortes.py
+      hash: md5
+      md5: 9cb09ce74a160751fb15b479a12eaef6
+      size: 685
+    - path: src/experimentos/avaliacao_oficial.py
+      hash: md5
+      md5: 3a29c75b3f2ea6da17a78eeece81c2af
+      size: 6667
+    - path: src/experimentos/cnn.py
+      hash: md5
+      md5: 797a31aacc73307f1ea0141bb7a97b75
+      size: 9102
+    - path: src/experimentos/rastreamento.py
+      hash: md5
+      md5: 72b8755426f29772941e630fbd758134
+      size: 3844
+    - path: third_party/luna16
+      hash: md5
+      md5: 421c13dc2e3b9f168cb523fb3647c82e.dir
+      size: 24962
+      nfiles: 5
+    params:
+      configuracao/config.yaml:
+        avaliacao:
+          pontos_fp_por_exame:
+          - 0.125
+          - 0.25
+          - 0.5
+          - 1
+          - 2
+          - 4
+          - 8
+          pontos_de_operacao:
+          - 1
+          - 4
+          bootstrap_reamostras: 1000
+          intervalo_confianca: 0.95
+        cnn:
+          patch_size: 32
+          batch_size: 32
+          learning_rate: 0.0001
+          epochs: 15
+          dropout_rate: 0.3
+          weight_decay: 1e-05
+          negativos_por_positivo: 5
+          device: cuda
+          threads: 4
+        experimentos_cnn.epocas_40:
+          epochs: 40
+        rastreamento.experimento: PI3-Grupo-5
+        seed: 42
+    outs:
+    - path: modelos/cnn_epocas_40
+      hash: md5
+      md5: 023df06bb7a9570704e7b26ad8a8757c.dir
+      size: 18151749
+      nfiles: 19
+  treinar_cnn_variante@aumento:
+    cmd: .venv-cnn-gpu/bin/python scripts/18_treinar_cnn.py --variante aumento 
+      --saida modelos/cnn_aumento
+    deps:
+    - path: /media/kauan/HD Samuel/luna/archive/annotations.csv
+      hash: md5
+      md5: f4404df491aee6445a4485061bfdffdd
+      size: 136986
+      isexec: true
+    - path: /media/kauan/HD Samuel/luna/archive/candidates_V2/candidates_V2.csv
+      hash: md5
+      md5: eaef417c9e202327405f838f0e8bf7ac
+      size: 72058556
+      isexec: true
+    - path: /media/kauan/HD 
+        Samuel/luna/archive/evaluationScript/evaluationScript/annotations/annotations_excluded.csv
+      hash: md5
+      md5: cc20913a2f1a44e183958e7e2154ddfd
+      size: 3534875
+      isexec: true
+    - path: dados/processado/divisao.csv
+      hash: md5
+      md5: 5dd7faea5aa4de0bc721c9c1e082674b
+      size: 79158
+    - path: dados/processado/patches
+      hash: md5
+      md5: 05240b5e98282f4d2084028d7a4cc9d2.dir
+      size: 39690009514
+      nfiles: 888
+    - path: dados/processado/volumes
+      hash: md5
+      md5: 7c5c8025a80d44a1b39b31cd341c15c6.dir
+      size: 9206037290
+      nfiles: 888
+    - path: notebooks/curvafroc_pesquisa.ipynb
+      hash: md5
+      md5: 42e60c4421de33a1ff3a2819dcaccb86
+      size: 55649
+    - path: requirements-cnn-gpu.lock.txt
+      hash: md5
+      md5: 014c3ee03fb37fa1b3d8f93b8993f01b
+      size: 3358
+    - path: scripts/09_extrair_patches.py
+      hash: md5
+      md5: fe796ccf02a4abfce274655020b2d52d
+      size: 9140
+    - path: scripts/18_treinar_cnn.py
+      hash: md5
+      md5: c385f609efff8f496340c9437a9826a8
+      size: 10698
+    - path: src/config.py
+      hash: md5
+      md5: 8167e0210942c88a2baaec8b50216f0f
+      size: 1306
+    - path: src/detection/patches.py
+      hash: md5
+      md5: 1c214aac71fac81a40c221acaa20b193
+      size: 1244
+    - path: src/detection/procedencia_recortes.py
+      hash: md5
+      md5: 9cb09ce74a160751fb15b479a12eaef6
+      size: 685
+    - path: src/experimentos/avaliacao_oficial.py
+      hash: md5
+      md5: 3a29c75b3f2ea6da17a78eeece81c2af
+      size: 6667
+    - path: src/experimentos/cnn.py
+      hash: md5
+      md5: 797a31aacc73307f1ea0141bb7a97b75
+      size: 9102
+    - path: src/experimentos/rastreamento.py
+      hash: md5
+      md5: 72b8755426f29772941e630fbd758134
+      size: 3844
+    - path: third_party/luna16
+      hash: md5
+      md5: 421c13dc2e3b9f168cb523fb3647c82e.dir
+      size: 24962
+      nfiles: 5
+    params:
+      configuracao/config.yaml:
+        avaliacao:
+          pontos_fp_por_exame:
+          - 0.125
+          - 0.25
+          - 0.5
+          - 1
+          - 2
+          - 4
+          - 8
+          pontos_de_operacao:
+          - 1
+          - 4
+          bootstrap_reamostras: 1000
+          intervalo_confianca: 0.95
+        cnn:
+          patch_size: 32
+          batch_size: 32
+          learning_rate: 0.0001
+          epochs: 15
+          dropout_rate: 0.3
+          weight_decay: 1e-05
+          negativos_por_positivo: 5
+          device: cuda
+          threads: 4
+        experimentos_cnn.aumento:
+          epochs: 40
+          aumento: true
+        rastreamento.experimento: PI3-Grupo-5
+        seed: 42
+    outs:
+    - path: modelos/cnn_aumento
+      hash: md5
+      md5: ee70cbfad15fd318e28183d540c32943.dir
+      size: 18152640
+      nfiles: 19
+  treinar_cnn_variante@negativos_20:
+    cmd: .venv-cnn-gpu/bin/python scripts/18_treinar_cnn.py --variante 
+      negativos_20 --saida modelos/cnn_negativos_20
+    deps:
+    - path: /media/kauan/HD Samuel/luna/archive/annotations.csv
+      hash: md5
+      md5: f4404df491aee6445a4485061bfdffdd
+      size: 136986
+      isexec: true
+    - path: /media/kauan/HD Samuel/luna/archive/candidates_V2/candidates_V2.csv
+      hash: md5
+      md5: eaef417c9e202327405f838f0e8bf7ac
+      size: 72058556
+      isexec: true
+    - path: /media/kauan/HD 
+        Samuel/luna/archive/evaluationScript/evaluationScript/annotations/annotations_excluded.csv
+      hash: md5
+      md5: cc20913a2f1a44e183958e7e2154ddfd
+      size: 3534875
+      isexec: true
+    - path: dados/processado/divisao.csv
+      hash: md5
+      md5: 5dd7faea5aa4de0bc721c9c1e082674b
+      size: 79158
+    - path: dados/processado/patches
+      hash: md5
+      md5: 05240b5e98282f4d2084028d7a4cc9d2.dir
+      size: 39690009514
+      nfiles: 888
+    - path: dados/processado/volumes
+      hash: md5
+      md5: 7c5c8025a80d44a1b39b31cd341c15c6.dir
+      size: 9206037290
+      nfiles: 888
+    - path: notebooks/curvafroc_pesquisa.ipynb
+      hash: md5
+      md5: 42e60c4421de33a1ff3a2819dcaccb86
+      size: 55649
+    - path: requirements-cnn-gpu.lock.txt
+      hash: md5
+      md5: 014c3ee03fb37fa1b3d8f93b8993f01b
+      size: 3358
+    - path: scripts/09_extrair_patches.py
+      hash: md5
+      md5: fe796ccf02a4abfce274655020b2d52d
+      size: 9140
+    - path: scripts/18_treinar_cnn.py
+      hash: md5
+      md5: c385f609efff8f496340c9437a9826a8
+      size: 10698
+    - path: src/config.py
+      hash: md5
+      md5: 8167e0210942c88a2baaec8b50216f0f
+      size: 1306
+    - path: src/detection/patches.py
+      hash: md5
+      md5: 1c214aac71fac81a40c221acaa20b193
+      size: 1244
+    - path: src/detection/procedencia_recortes.py
+      hash: md5
+      md5: 9cb09ce74a160751fb15b479a12eaef6
+      size: 685
+    - path: src/experimentos/avaliacao_oficial.py
+      hash: md5
+      md5: 3a29c75b3f2ea6da17a78eeece81c2af
+      size: 6667
+    - path: src/experimentos/cnn.py
+      hash: md5
+      md5: 797a31aacc73307f1ea0141bb7a97b75
+      size: 9102
+    - path: src/experimentos/rastreamento.py
+      hash: md5
+      md5: 72b8755426f29772941e630fbd758134
+      size: 3844
+    - path: third_party/luna16
+      hash: md5
+      md5: 421c13dc2e3b9f168cb523fb3647c82e.dir
+      size: 24962
+      nfiles: 5
+    params:
+      configuracao/config.yaml:
+        avaliacao:
+          pontos_fp_por_exame:
+          - 0.125
+          - 0.25
+          - 0.5
+          - 1
+          - 2
+          - 4
+          - 8
+          pontos_de_operacao:
+          - 1
+          - 4
+          bootstrap_reamostras: 1000
+          intervalo_confianca: 0.95
+        cnn:
+          patch_size: 32
+          batch_size: 32
+          learning_rate: 0.0001
+          epochs: 15
+          dropout_rate: 0.3
+          weight_decay: 1e-05
+          negativos_por_positivo: 5
+          device: cuda
+          threads: 4
+        experimentos_cnn.negativos_20:
+          epochs: 40
+          aumento: true
+          negativos_por_positivo: 20
+        rastreamento.experimento: PI3-Grupo-5
+        seed: 42
+    outs:
+    - path: modelos/cnn_negativos_20
+      hash: md5
+      md5: 437b01e54109f63a610b821d41cf178d.dir
+      size: 19841370
+      nfiles: 19
+  treinar_random_forest_centro:
+    cmd: .venv/bin/python scripts/25_treinar_random_forest_centro.py
+    deps:
+    - path: /media/kauan/HD Samuel/luna/archive/annotations.csv
+      hash: md5
+      md5: f4404df491aee6445a4485061bfdffdd
+      size: 136986
+      isexec: true
+    - path: /media/kauan/HD Samuel/luna/archive/candidates_V2/candidates_V2.csv
+      hash: md5
+      md5: eaef417c9e202327405f838f0e8bf7ac
+      size: 72058556
+      isexec: true
+    - path: /media/kauan/HD 
+        Samuel/luna/archive/evaluationScript/evaluationScript/annotations/annotations_excluded.csv
+      hash: md5
+      md5: cc20913a2f1a44e183958e7e2154ddfd
+      size: 3534875
+      isexec: true
+    - path: dados/processado/divisao.csv
+      hash: md5
+      md5: 5dd7faea5aa4de0bc721c9c1e082674b
+      size: 79158
+    - path: dados/processado/patches
+      hash: md5
+      md5: 05240b5e98282f4d2084028d7a4cc9d2.dir
+      size: 39690009514
+      nfiles: 888
+    - path: requirements-rastreamento.lock.txt
+      hash: md5
+      md5: 2d947512d861bd4971f6accc420639e3
+      size: 2837
+    - path: scripts/25_treinar_random_forest_centro.py
+      hash: md5
+      md5: cda45691cf954d59cce8e3788c3db46a
+      size: 5636
+    - path: src/config.py
+      hash: md5
+      md5: 8167e0210942c88a2baaec8b50216f0f
+      size: 1306
+    - path: src/detection/features.py
+      hash: md5
+      md5: ff81969a56418ed5eff395a2a2e5ea5e
+      size: 6288
+    - path: src/experimentos/avaliacao_oficial.py
+      hash: md5
+      md5: 3a29c75b3f2ea6da17a78eeece81c2af
+      size: 6667
+    - path: src/experimentos/rastreamento.py
+      hash: md5
+      md5: 72b8755426f29772941e630fbd758134
+      size: 3844
+    - path: third_party/luna16
+      hash: md5
+      md5: 421c13dc2e3b9f168cb523fb3647c82e.dir
+      size: 24962
+      nfiles: 5
+    params:
+      configuracao/config.yaml:
+        avaliacao:
+          pontos_fp_por_exame:
+          - 0.125
+          - 0.25
+          - 0.5
+          - 1
+          - 2
+          - 4
+          - 8
+          pontos_de_operacao:
+          - 1
+          - 4
+          bootstrap_reamostras: 1000
+          intervalo_confianca: 0.95
+        caminhos.caracteristicas_centro: 
+          dados/intermediario/caracteristicas_centro
+        caminhos.random_forest_centro: modelos/random_forest_centro
+        random_forest:
+          n_estimators: 200
+          max_depth: 20
+          min_samples_leaf: 2
+          max_features: sqrt
+          class_weight: balanced
+          n_jobs: 2
+        random_forest_centro:
+          lados:
+          - 8
+          - 16
+          - 34
+          processos: 4
+        rastreamento.experimento: PI3-Grupo-5
+        seed: 42
+    outs:
+    - path: dados/intermediario/caracteristicas_centro
+      hash: md5
+      md5: c73885650a36dd9fc440cc1219aacd7c.dir
+      size: 265333763
+      nfiles: 2
+    - path: modelos/random_forest_centro
+      hash: md5
+      md5: db843473c314bbcc40859c446242a161.dir
+      size: 30482460
+      nfiles: 16
+  treinar_cnn_variante@lr_3e-4:
+    cmd: .venv-cnn-gpu/bin/python scripts/18_treinar_cnn.py --variante lr_3e-4 
+      --saida modelos/cnn_lr_3e-4
+    deps:
+    - path: /media/kauan/HD Samuel/luna/archive/annotations.csv
+      hash: md5
+      md5: f4404df491aee6445a4485061bfdffdd
+      size: 136986
+      isexec: true
+    - path: /media/kauan/HD Samuel/luna/archive/candidates_V2/candidates_V2.csv
+      hash: md5
+      md5: eaef417c9e202327405f838f0e8bf7ac
+      size: 72058556
+      isexec: true
+    - path: /media/kauan/HD 
+        Samuel/luna/archive/evaluationScript/evaluationScript/annotations/annotations_excluded.csv
+      hash: md5
+      md5: cc20913a2f1a44e183958e7e2154ddfd
+      size: 3534875
+      isexec: true
+    - path: dados/processado/divisao.csv
+      hash: md5
+      md5: 5dd7faea5aa4de0bc721c9c1e082674b
+      size: 79158
+    - path: dados/processado/patches
+      hash: md5
+      md5: 05240b5e98282f4d2084028d7a4cc9d2.dir
+      size: 39690009514
+      nfiles: 888
+    - path: dados/processado/volumes
+      hash: md5
+      md5: 7c5c8025a80d44a1b39b31cd341c15c6.dir
+      size: 9206037290
+      nfiles: 888
+    - path: notebooks/curvafroc_pesquisa.ipynb
+      hash: md5
+      md5: 42e60c4421de33a1ff3a2819dcaccb86
+      size: 55649
+    - path: requirements-cnn-gpu.lock.txt
+      hash: md5
+      md5: 014c3ee03fb37fa1b3d8f93b8993f01b
+      size: 3358
+    - path: scripts/09_extrair_patches.py
+      hash: md5
+      md5: fe796ccf02a4abfce274655020b2d52d
+      size: 9140
+    - path: scripts/18_treinar_cnn.py
+      hash: md5
+      md5: c385f609efff8f496340c9437a9826a8
+      size: 10698
+    - path: src/config.py
+      hash: md5
+      md5: 8167e0210942c88a2baaec8b50216f0f
+      size: 1306
+    - path: src/detection/patches.py
+      hash: md5
+      md5: 1c214aac71fac81a40c221acaa20b193
+      size: 1244
+    - path: src/detection/procedencia_recortes.py
+      hash: md5
+      md5: 9cb09ce74a160751fb15b479a12eaef6
+      size: 685
+    - path: src/experimentos/avaliacao_oficial.py
+      hash: md5
+      md5: 3a29c75b3f2ea6da17a78eeece81c2af
+      size: 6667
+    - path: src/experimentos/cnn.py
+      hash: md5
+      md5: 797a31aacc73307f1ea0141bb7a97b75
+      size: 9102
+    - path: src/experimentos/rastreamento.py
+      hash: md5
+      md5: 72b8755426f29772941e630fbd758134
+      size: 3844
+    - path: third_party/luna16
+      hash: md5
+      md5: 421c13dc2e3b9f168cb523fb3647c82e.dir
+      size: 24962
+      nfiles: 5
+    params:
+      configuracao/config.yaml:
+        avaliacao:
+          pontos_fp_por_exame:
+          - 0.125
+          - 0.25
+          - 0.5
+          - 1
+          - 2
+          - 4
+          - 8
+          pontos_de_operacao:
+          - 1
+          - 4
+          bootstrap_reamostras: 1000
+          intervalo_confianca: 0.95
+        cnn:
+          patch_size: 32
+          batch_size: 32
+          learning_rate: 0.0001
+          epochs: 15
+          dropout_rate: 0.3
+          weight_decay: 1e-05
+          negativos_por_positivo: 5
+          device: cuda
+          threads: 4
+        experimentos_cnn.lr_3e-4:
+          epochs: 40
+          aumento: true
+          negativos_por_positivo: 20
+          learning_rate: 0.0003
+        rastreamento.experimento: PI3-Grupo-5
+        seed: 42
+    outs:
+    - path: modelos/cnn_lr_3e-4
+      hash: md5
+      md5: b2bd43f242b9b14bbbc22f6de7746ad1.dir
+      size: 20016256
+      nfiles: 19

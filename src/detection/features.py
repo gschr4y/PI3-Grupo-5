@@ -42,6 +42,49 @@ def calcular(patch) -> dict[str, float]:
     return resultado
 
 
+def calcular_lote(cubos) -> pd.DataFrame:
+    """As mesmas estatísticas de `calcular`, para vários cubos de uma vez."""
+    valores = np.asarray(cubos, dtype=np.float64).reshape(len(cubos), -1)
+    if valores.shape[1] == 0 or not np.isfinite(valores).all():
+        raise ValueError("cubos vazios ou com valor ausente ou infinito")
+    desvio = valores.std(axis=1)
+    curtose = np.zeros(len(valores))
+    variam = desvio > 0
+    if variam.any():
+        curtose[variam] = kurtosis(valores[variam], axis=1)
+    p25, p75 = np.percentile(valores, [25, 75], axis=1)
+    return pd.DataFrame({"media": valores.mean(axis=1), "desvio_padrao": desvio, "curtose": curtose,
+                         "minimo": valores.min(axis=1), "maximo": valores.max(axis=1),
+                         "percentil_25": p25, "percentil_75": p75})
+
+
+def calcular_multiescala(cubos, lados) -> pd.DataFrame:
+    """Estatísticas de cubos concêntricos de cada lado, recortados do centro do recorte."""
+    total = cubos.shape[1]
+    partes = []
+    for lado in lados:
+        if lado > total or (total - lado) % 2:
+            raise ValueError(f"lado {lado} nao centra num recorte de {total}")
+        margem = (total - lado) // 2
+        centro = cubos[:, margem:margem + lado, margem:margem + lado, margem:margem + lado]
+        partes.append(calcular_lote(centro).add_suffix(f"_{lado}"))
+    return pd.concat(partes, axis=1)
+
+
+def multiescala_do_exame(arquivo, esperado: pd.DataFrame, lados) -> pd.DataFrame:
+    """Lê os recortes de um exame, confere identidade e classe contra a lista V2 e calcula a multiescala."""
+    with np.load(arquivo, allow_pickle=False) as dados:
+        if not np.array_equal(dados["candidate_id"], esperado.index.to_numpy()):
+            raise ValueError(f"candidate_id diverge da lista V2: {arquivo}")
+        if not np.array_equal(dados["classe_luna16"], esperado["class"].to_numpy()):
+            raise ValueError(f"classes divergem da lista V2: {arquivo}")
+        medidas = calcular_multiescala(dados["patches"], lados)
+    medidas.insert(0, "candidate_id", esperado.index.to_numpy())
+    medidas.insert(1, "seriesuid", esperado.seriesuid.to_numpy())
+    medidas.insert(2, "classe_luna16", esperado["class"].to_numpy())
+    return medidas
+
+
 def selecionar_amostra(candidatos: pd.DataFrame, positivos: int, negativos: int, semente: int):
     if positivos < 0 or negativos < 0:
         raise ValueError("quantidades da amostra precisam ser nao negativas")
