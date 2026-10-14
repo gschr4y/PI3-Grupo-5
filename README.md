@@ -187,3 +187,10 @@ Kauan Felipe Nascimento da Silva, Náthaly Alessandra Batistella, Arthur Nicolas
 Samuel Gonçalves Malta, Gabriel Schraider da Silveira, Lucas Gabriel Teixeira da Silva.
 
 Projeto Integrador de Extensão III, Inteligência Artificial, Biopark, 2026/2.
+
+## CNN em preparação
+
+O extrator e a CNN da PR #5 estão integrados localmente, com verificação de origem
+dos recortes e avaliação final separada do treino. O ambiente CPU, os comandos e
+as limitações da verificação técnica estão em [CNN e MLflow](docs/09-cnn-mlflow.md).
+O lote completo de NPZ com procedência ainda precisa ser gerado antes do treino longo.

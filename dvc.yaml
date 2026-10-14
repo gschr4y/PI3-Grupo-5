@@ -360,3 +360,60 @@ stages:
       - ${caminhos.random_forest}:
           cache: false
           persist: true
+
+  patches:
+    cmd: .venv-cnn/bin/python scripts/09_extrair_patches.py
+    deps:
+      - scripts/09_extrair_patches.py
+      - src/config.py
+      - src/detection/patches.py
+      - src/detection/procedencia_recortes.py
+      - requirements-cnn-cpu.lock.txt
+      - ${caminhos.luna16_candidatos}
+      - dados/processado/volumes
+    params:
+      - configuracao/config.yaml:
+          - candidatos.patch
+          - caminhos.volumes
+          - caminhos.processado
+          - caminhos.intermediario
+    outs:
+      - dados/processado/patches:
+          cache: false
+          persist: true
+      - dados/intermediario/resumo_patches.json:
+          cache: false
+      - dados/intermediario/falhas_patches.csv:
+          cache: false
+
+  treinar_cnn:
+    cmd: .venv-cnn/bin/python scripts/18_treinar_cnn.py --saida ${caminhos.cnn_treino}
+    deps:
+      - scripts/18_treinar_cnn.py
+      - src/experimentos/cnn.py
+      - src/experimentos/avaliacao_oficial.py
+      - src/experimentos/rastreamento.py
+      - src/detection/procedencia_recortes.py
+      - scripts/09_extrair_patches.py
+      - src/detection/patches.py
+      - src/config.py
+      - third_party/luna16
+      - requirements-cnn-cpu.lock.txt
+      - notebooks/curvafroc_pesquisa.ipynb
+      - dados/processado/divisao.csv
+      - dados/processado/patches
+      - dados/processado/volumes
+      - ${caminhos.luna16_candidatos}
+      - ${caminhos.luna16_anotacoes}
+      - ${caminhos.luna16_anotacoes_excluidas}
+    params:
+      - configuracao/config.yaml:
+          - seed
+          - cnn
+          - avaliacao
+          - caminhos.cnn_treino
+          - rastreamento.experimento
+    outs:
+      - ${caminhos.cnn_treino}:
+          cache: false
+          persist: true

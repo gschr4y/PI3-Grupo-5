@@ -10,6 +10,7 @@ as alterações locais dessa execução.
 
 | Arquivo | O que é | Commit | Dado de treino | Resultado no teste |
 |---|---|---|---|---|
+| `cnn_verificacao_4_exames/modelo.pt` | CNN3D, verificação técnica de uma época | Base `7ec3da3`, integração local da PR #5 e correções; run `9002b29b2f0d4c06a1388e8bd300baf1` | 18 candidatos de dois exames; validação em outros dois exames | Não avaliado; teste reservado |
 | `random_forest_v2/modelo.joblib` | Random Forest inicial, 200 árvores | Base `c87bf93`, com alterações locais; run `1663d6b906ee486bb0cfff9fdd09457d` | 529.500 candidatos V2 de 622 pacientes | Não avaliado; teste reservado |
 
 Nome: `<abordagem>_<data>_<commit-curto>.<ext>`, por exemplo `baseline-rf_2026-09-14_a3f21c.joblib`.
@@ -22,3 +23,8 @@ O primeiro treino foi executado em 04/10/2026 por
 `scripts/17_treinar_random_forest.py`. O ajuste levou 145,01 segundos e produziu
 75.063 escores de validação. O run do MLflow contém os artefatos e a procedência.
 FROC e CPM ainda não foram medidos. Ver `docs/08-primeiro-treino.md`.
+
+O ensaio técnico da CNN em 05/10/2026 verificou o fluxo de treinamento, salvamento
+e avaliação com `scripts/18_treinar_cnn.py`. O CPM de validação foi 0 nessa pequena
+amostra, sem valor como estimativa do desempenho na base completa. A configuração
+e o código da execução estão no MLflow. Ver `docs/09-cnn-mlflow.md`.

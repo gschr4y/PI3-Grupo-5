@@ -37,8 +37,9 @@ def arquivos_codigo():
     arquivos = set()
     for pasta in ("src", "scripts"):
         arquivos.update((config.RAIZ / pasta).rglob("*.py"))
+    arquivos.update((config.RAIZ / "third_party/luna16").rglob("*.py"))
     arquivos.update((config.RAIZ / "configuracao").glob("*.yaml"))
-    for nome in ("dvc.yaml", "dvc.lock", "requirements.txt", "requirements-rastreamento.lock.txt"):
+    for nome in ("dvc.yaml", "dvc.lock", "requirements.txt", "requirements-rastreamento.lock.txt", "requirements-cnn-cpu.lock.txt"):
         caminho = config.RAIZ / nome
         if caminho.exists():
             arquivos.add(caminho)

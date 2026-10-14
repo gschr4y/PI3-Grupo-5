@@ -62,6 +62,7 @@ caminhos:
   mlflow_preparacao: "dados/intermediario/mlflow_preparacao.json"
   cache_caracteristicas: "dados/intermediario/caracteristicas_cache"
   random_forest: "modelos/random_forest_v2"
+  cnn_treino: "modelos/cnn_v2"
 
 selecao:
   # Os dez subsets do desafio, que são as dobras oficiais de validação cruzada.
@@ -166,3 +167,15 @@ random_forest:
   max_features: "sqrt"
   class_weight: "balanced"
   n_jobs: 2
+
+# Configuração inicial da CNN, sem consulta automática ao teste final.
+cnn:
+  patch_size: 32
+  batch_size: 32
+  learning_rate: 0.0001
+  epochs: 15
+  dropout_rate: 0.3
+  weight_decay: 0.00001
+  negativos_por_positivo: 5
+  device: cpu
+  threads: 4
