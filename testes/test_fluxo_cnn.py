@@ -27,7 +27,7 @@ def test_treino_nao_exige_recortes_de_teste(tmp_path, monkeypatch):
                       tmp_path / "candidates_V2.csv", index=False)
     monkeypatch.setattr(script, "argumentos", lambda: argparse.Namespace(
         config=None, dados=tmp_path, saida=tmp_path / "modelo", reproduzir_de=None,
-        variante=None))
+        variante=None, semente=None))
     monkeypatch.setattr(script.config, "carregar", lambda _: {
         "cnn": {"epochs": 1, "negativos_por_positivo": 1}, "caminhos": {"volumes": tmp_path},
     })
@@ -50,6 +50,14 @@ def test_avaliacao_final_recusa_mudar_a_divisao(tmp_path, monkeypatch):
                                            "--saida", str(tmp_path / "saida")])
     with pytest.raises(ValueError, match="entrada congelada"):
         script.main()
+
+
+def test_semente_de_treino_e_opcional_e_inteira(monkeypatch, tmp_path):
+    script = carregar("18_treinar_cnn.py")
+    monkeypatch.setattr(script.sys, "argv", ["18", "--saida", str(tmp_path)])
+    assert script.argumentos().semente is None
+    monkeypatch.setattr(script.sys, "argv", ["18", "--saida", str(tmp_path), "--semente", "43"])
+    assert script.argumentos().semente == 43
 
 
 def test_variante_sobrescreve_cnn_e_recusa_chave_desconhecida():

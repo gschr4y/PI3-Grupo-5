@@ -22,3 +22,5 @@ memória na hora.
 | [0006](0006-normalizacao-entra-no-volume-salvo.md) | a normalização [0, 1] entra no volume salvo |
 | [0007](0007-cnn-treina-na-gpu-com-determinismo-parcial.md) | a CNN treina na GPU, com determinismo que avisa em vez de interromper |
 | [0008](0008-modelo-congelado-para-o-teste.md) | o modelo congelado para a avaliação final no teste |
+| [0009](0009-segundo-uso-do-teste-para-o-random-forest.md) | o segundo uso do teste, só para o Random Forest centro congelado |
+| [0010](0010-tres-sementes-da-rede-escolhida.md) | a rede escolhida repetida com mais duas sementes, só na validação |

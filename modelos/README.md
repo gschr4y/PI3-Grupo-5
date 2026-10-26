@@ -20,7 +20,7 @@ as alterações locais dessa execução.
 | `cnn_aumento/modelo.pt` | CNN3D, 40 épocas, aumento de dados | Base `7ec3da3`, alterações locais da integração da PR #5 e dos experimentos de 13/10; run `7b2c2f4356a74287aeb1f802ae880c04` | 6.588 candidatos V2 de 622 pacientes | Não avaliado; teste reservado |
 | `cnn_negativos_20/modelo.pt` | CNN3D, 40 épocas, aumento, 20 negativos por positivo | Base `7ec3da3`, alterações locais da integração da PR #5 e dos experimentos de 13/10; run `5529e76dd327489d870dd51b1f875036` | 23.058 candidatos V2 de 622 pacientes | Não avaliado; teste reservado |
 | `cnn_lr_3e-4/modelo.pt` | CNN3D, 40 épocas, aumento, 20 negativos, learning rate 3e-4 | Base `7ec3da3`, alterações locais da integração da PR #5 e dos experimentos de 13/10; run `2f8b0a3c57c84d9e8f51dea2eab94b7f` | 23.058 candidatos V2 de 622 pacientes | CPM 0,724 (IC95% 0,670 a 0,778); sens. 4 FP 0,883 (0,843 a 0,929); run `d754f0738780451a8a734be0ac58a435` |
-| `random_forest_centro/modelo.joblib` | Random Forest, 21 features em cubos de 8, 16 e 34 voxels | Base `7ec3da3`, alterações locais da integração da PR #5 e dos experimentos de 13/10; run `5169e10d13874969804d14f29cca6ea6` | 529.500 candidatos V2 de 622 pacientes | Não avaliado; teste reservado |
+| `random_forest_centro/modelo.joblib` | Random Forest, 21 features em cubos de 8, 16 e 34 voxels | Base `7ec3da3`, alterações locais da integração da PR #5 e dos experimentos de 13/10; run `5169e10d13874969804d14f29cca6ea6` | 529.500 candidatos V2 de 622 pacientes | Pendente: segundo uso do teste decidido (decisão 0009), `scripts/26_avaliar_teste_random_forest.py` ainda não executado |
 | `random_forest_v2/modelo.joblib` | Random Forest inicial, 200 árvores | Base `c87bf93`, com alterações locais; run `1663d6b906ee486bb0cfff9fdd09457d` | 529.500 candidatos V2 de 622 pacientes | Não avaliado; teste reservado |
 
 Nome: `<abordagem>_<data>_<commit-curto>.<ext>`, por exemplo `baseline-rf_2026-09-14_a3f21c.joblib`.
@@ -53,3 +53,9 @@ validação. A melhor na validação foi `cnn_lr_3e-4`, com CPM 0,752 (IC95% de 
 
 Em 13/10/2026 avaliamos `cnn_lr_3e-4` uma única vez no teste, congelada pela decisão 0008. Ver
 `docs/12-avaliacao-final-teste.md`.
+
+Em 26/10/2026 registramos, antes de executar, o segundo uso do teste só para o Random Forest
+centro congelado (decisão 0009) e o treino da `cnn_lr_3e-4` com as sementes 43 e 44, medidas só
+na validação (decisão 0010). As pastas `random_forest_centro_teste_final`,
+`cnn_lr_3e-4_semente_43` e `cnn_lr_3e-4_semente_44` ainda não existem. Ver
+`docs/14-baseline-literatura-sementes-e-teste-rf.md`.

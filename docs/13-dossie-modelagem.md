@@ -318,8 +318,10 @@ fora dos 100 maiores escores.
   intervalo existe só na validação.
 - Os modelos usam a lista V2. A lista própria do grupo tem cobertura medida, mas não foi
   classificada.
-- A comparação com trabalhos publicados no LUNA16 não está feita com fonte conferida neste
-  repositório. [FONTE?]
+- A comparação com trabalhos publicados no LUNA16 está em
+  `docs/14-baseline-literatura-sementes-e-teste-rf.md`, com fontes conferidas em 26/10/2026.
+  Nenhum dos artigos usa o nosso protocolo de teste fixo; os números são referência, não
+  comparação direta.
 - A reprodutibilidade na GPU é parcial: o PyTorch não garante pesos idênticos entre execuções.
 
 ## 12. Como reproduzir

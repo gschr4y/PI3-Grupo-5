@@ -68,6 +68,10 @@ caminhos:
   diagnostico_random_forest: "relatorios/experimentos/diagnostico_random_forest"
   random_forest_centro: "modelos/random_forest_centro"
   caracteristicas_centro: "dados/intermediario/caracteristicas_centro"
+  # Segundo uso do teste, só para o Random Forest centro congelado. Ver decisão 0009.
+  random_forest_centro_teste: "modelos/random_forest_centro_teste_final"
+  comparacao_teste: "relatorios/experimentos/comparacao_teste"
+  sementes_cnn: "relatorios/experimentos/sementes_cnn"
 
 selecao:
   # Os dez subsets do desafio, que são as dobras oficiais de validação cruzada.
@@ -208,6 +212,13 @@ experimentos_cnn:
     aumento: true
     negativos_por_positivo: 20
     learning_rate: 0.0003
+
+# A rede escolhida repetida com outras sementes de treino, só na validação. As sementes foram
+# fixadas antes de treinar e não mudam depois de ver o resultado. Ver decisão 0010.
+sementes_cnn:
+  variante: lr_3e-4
+  original: 42
+  extras: [43, 44]
 
 # Modelos comparados na validação pelo script 23. As diferenças pareadas de CPM são contra a
 # referência, nas mesmas reamostras por exame do avaliador oficial.
