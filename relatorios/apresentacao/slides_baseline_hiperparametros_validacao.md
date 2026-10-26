@@ -27,7 +27,8 @@ Fonte de cada número: `docs/14-baseline-literatura-sementes-e-teste-rf.md`. Ond
 mais parecido com o nosso protocolo é a trilha de redução de falsos positivos do próprio
 desafio. As metas são em sensibilidade a 4 falsos positivos, um ponto da curva, e não em CPM."
 
-*Antes de apresentar:* o grupo confirma que o "Li 2025" é o DOI 10.1038/s41598-025-97187-w.
+Referências: Li et al. (2025), DOI 10.1038/s41598-025-97187-w, confirmado pelo PDF; Zheng et al.
+(2022), DOI 10.3390/diagnostics12112660; Setio et al. (2017), DOI 10.1016/j.media.2017.06.015.
 
 ---
 

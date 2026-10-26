@@ -16,13 +16,14 @@ Screening*. Diagnostics, 12(11):2660, 2022. DOI
 [10.3390/diagnostics12112660](https://doi.org/10.3390/diagnostics12112660). É o mesmo trabalho
 que a decisão 0002 já cita pela dilatação da máscara com esfera de raio 6.
 
-**Li et al. (2025) — localizada, identificação a confirmar pelo grupo.** Li Y, Hui L, Wang X,
+**Li et al. (2025) — confirmada.** Li Y, Hui L, Wang X,
 Zou L, Chua S. *Lung nodule detection using a multi-scale convolutional neural network and global
 channel spatial attention mechanisms*. Scientific Reports, 15:12313, 2025. DOI
 [10.1038/s41598-025-97187-w](https://doi.org/10.1038/s41598-025-97187-w). Foi o único artigo de
 2025 com primeiro autor Li, LUNA16 e CPM que encontramos, e a tabela de comparação dele cita
 Zheng et al. com os mesmos sete valores do artigo de 2022, o que sugere que o grupo tirou as
-duas referências daí. **Isso é inferência:** quem trouxe a referência precisa confirmar o DOI.
+duas referências daí. Em 26/10/2026 o grupo confirmou com o PDF do artigo que é ele: mesmo DOI,
+CPM 0,929 com validação cruzada em 10 dobras, e a referência 21 é o Zheng et al. (2022) acima.
 Não confundir com o "Li et al. (2023)" da decisão 0002, que é outro trabalho, sobre perda de
 nódulos na segmentação.
 
@@ -44,7 +45,7 @@ positivo por exame.
 Nosso protocolo: redução de falsos positivos sobre a lista **candidates_V2 fornecida pelo
 desafio**, avaliador oficial do LUNA16 (`third_party/luna16`), até 100 marcas por exame, divisão
 fixa por paciente com treino nos subsets 0–6, validação no 7 e **teste nos subsets 8 e 9, 176
-exames e 223 nódulos**, uma única vez.
+exames e 223 nódulos**, uma única vez por modelo.
 
 - Li (2025), Zheng (2022), TiCNet e Wang são **sistemas completos**: geram os próprios
   candidatos, usam redes muito maiores e reportam a média de 10 (ou 6) dobras sobre os 888
@@ -58,8 +59,7 @@ exames e 223 nódulos**, uma única vez.
 
 ### 1.4 Quais usar nos slides
 
-1. **Li et al. (2025)** como estado da arte recente (CPM 0,929), depois que o grupo confirmar
-   que é esse o artigo.
+1. **Li et al. (2025)** como estado da arte recente (CPM 0,929).
 2. **Zheng et al. (2022)** (CPM 0,906): confirmado, já citado no projeto, e aparece na tabela de
    Li, o que liga as duas referências.
 3. **Setio et al. (2017), trilha de redução de FP** (CPM de 0,758 a 0,908): a referência de
