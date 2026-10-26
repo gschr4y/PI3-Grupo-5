@@ -336,7 +336,8 @@ Ambientes: `.venv` para o pipeline e o Random Forest, `.venv-cnn` para os recort
 .venv-cnn-gpu/bin/python -m pytest testes -q
 ```
 
-Pesos, probabilidades e avaliações ficam em `modelos/`, fora do Git, e cada execução tem cópia
-no MLflow com código, ambiente e hashes das entradas. A tabela de modelos está em
+Pesos, probabilidades e avaliações ficam em `modelos/`. A rede escolhida, a avaliação no teste e o
+Random Forest centro estão versionados no Git desde 25/10/2026; as demais variantes ficam fora, e
+cada execução tem cópia no MLflow com código, ambiente e hashes das entradas. A tabela de modelos está em
 `modelos/README.md`, e as curvas de validação dos sete modelos em
 `relatorios/experimentos/comparacao_validacao/froc_validacao.png`.

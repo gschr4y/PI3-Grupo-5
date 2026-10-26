@@ -188,7 +188,7 @@ src/
   config.py          lê o config.yaml e fixa a semente
 configuracao/        config.yaml, único lugar com caminhos e parâmetros
 dados/               fora do git, é onde o pipeline escreve
-modelos/             o peso fica fora do git, o registro fica no README
+modelos/             a rede escolhida, o teste final e o Random Forest centro; o resto fica fora do git
 docs/                o que o grupo estabeleceu, incluindo os registros de decisão
                      e historico-do-projeto.md, com a ordem em que cada coisa foi feita
 notebooks/           análise exploratória

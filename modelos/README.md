@@ -1,7 +1,11 @@
 # Modelos
 
-O peso não entra no git, o registro entra. Cada modelo treinado ganha uma linha aqui, e o
-arquivo fica nesta pasta, cortado pelo `.gitignore`.
+Cada modelo treinado ganha uma linha aqui. Desde 25/10/2026, três pastas entram inteiras no git,
+com peso, previsões e avaliação: `cnn_lr_3e-4` (a rede escolhida), `cnn_lr_3e-4_teste_final` (a
+avaliação no teste) e `random_forest_centro` (o modelo simples de comparação). Os pesos somam
+cerca de 13 MB e as previsões são o que o grupo usa para avaliar e analisar erros. As outras
+pastas continuam cortadas pelo `.gitignore`; os resultados delas estão em
+`relatorios/experimentos/comparacao_validacao/`.
 
 Toda linha identifica o estado do código que gerou o modelo. Enquanto a entrega
 não foi commitada, registramos o commit base e o run do MLflow, que guarda a cópia
