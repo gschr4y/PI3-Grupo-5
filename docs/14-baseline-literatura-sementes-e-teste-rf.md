@@ -103,34 +103,69 @@ diferença pareada de CPM, como em `docs/11`.
 | Modelo | Conjunto | CPM | IC95% | Sens. 1 FP | Sens. 4 FP | Situação |
 |---|---|---:|---|---:|---:|---|
 | CNN `cnn_lr_3e-4` | Teste, 176 exames | 0,724 | 0,670 a 0,778 | 0,735 | 0,883 | **Medido** em 13/10/2026 |
-| Random Forest centro | Teste, 176 exames | — | — | — | — | **Pendente**: precisa rodar o script 26 |
+| Random Forest centro | Teste, 176 exames | 0,420 | 0,349 a 0,490 | 0,381 | 0,520 | **Medido** em 26/10/2026, uso único |
 | CNN `cnn_lr_3e-4` | Validação, 89 exames | 0,752 | 0,681 a 0,819 | 0,784 | 0,883 | Medido |
 | Random Forest centro | Validação, 89 exames | 0,409 | 0,323 a 0,505 | 0,405 | 0,559 | Medido |
 
-Sensibilidade da CNN no teste nos sete pontos: 0,457 / 0,574 / 0,641 / 0,735 / 0,852 / 0,883 /
-0,924.
+Sete pontos no teste, com IC95% do bootstrap por exame
+(`relatorios/experimentos/comparacao_teste/pontos_operacao.csv`):
 
-**Bloqueio.** O Random Forest precisa das features dos 176 exames de teste, calculadas dos
-recortes em `dados/processado/patches/*.npz`, e o avaliador precisa de `annotations.csv` e
-`annotations_excluded.csv`. Nada disso está no repositório nem nesta máquina (os dados vivem no
-HD externo indicado em `configuracao/config.yaml`). O script está pronto:
+| FP por exame | 0,125 | 0,25 | 0,5 | 1 | 2 | 4 | 8 | CPM |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| CNN | 0,457 | 0,574 | 0,641 | 0,735 | 0,852 | 0,883 | 0,924 | 0,724 |
+| IC95% CNN | 0,364–0,555 | 0,479–0,640 | 0,561–0,728 | 0,659–0,819 | 0,801–0,896 | 0,843–0,929 | 0,883–0,962 | 0,670–0,778 |
+| Random Forest centro | 0,283 | 0,332 | 0,354 | 0,381 | 0,480 | 0,520 | 0,587 | 0,420 |
+| IC95% RF | 0,209–0,355 | 0,258–0,407 | 0,285–0,431 | 0,314–0,460 | 0,401–0,556 | 0,442–0,603 | 0,504–0,667 | 0,349–0,490 |
+
+**Diferença pareada de CPM, CNN menos RF, no teste: 0,304 (IC95% 0,247 a 0,360)**, a CNN acima em
+100% das 1.000 reamostras. Na validação a diferença foi 0,342 (IC95% 0,252 a 0,437). Dentro dos
+100 maiores escores de cada exame, o RF alcançou 189 dos 223 nódulos e a CNN, 218
+(`CADAnalysis.txt`). O RF ficou com 17.596 marcas e não 17.600 porque o avaliador oficial guarda
+só os escores estritamente maiores que o 101º do exame, e o RF tem empates; é o comportamento do
+programa oficial.
+
+Figura: `relatorios/experimentos/comparacao_teste/froc.png` (as duas curvas FROC, os sete pontos
+com IC95% e a faixa do bootstrap). Resultados completos do RF:
+`modelos/random_forest_centro_teste_final/`, run do MLflow `41ecf929305b4edf9e14fc5839d8513b`.
+
+### 3.3 Como a avaliação foi executada
+
+Em 26/10/2026, na máquina do Lucas (Windows, Xeon E5-2697 v3, CPU), com a base do LUNA16 no
+Google Drive do grupo e o ambiente `.venv` montado do `requirements-cnn-cpu.lock.txt`
+(scikit-learn 1.9.1, a versão do treino):
 
 ```bash
-.venv/bin/python scripts/26_avaliar_teste_random_forest.py
-.venv/bin/python scripts/27_comparar_froc.py \
-    --avaliacao "CNN3D=modelos/cnn_lr_3e-4_teste_final" \
+.venv/Scripts/python scripts/26_avaliar_teste_random_forest.py --config _local/config_lucas.yaml
+.venv/Scripts/python scripts/27_comparar_froc.py \
+    --avaliacao "CNN3D (cnn_lr_3e-4)=modelos/cnn_lr_3e-4_teste_final" \
     --avaliacao "Random Forest centro=modelos/random_forest_centro_teste_final" \
     --titulo "Teste" --saida relatorios/experimentos/comparacao_teste
 ```
 
-O script 26 recusa rodar se o hash do modelo, da divisão ou da lista V2 diferir do registrado na
-decisão 0009, se a versão do scikit-learn não for a do treino (1.9.1), se os exames de teste
-diferirem dos avaliados na CNN ou se a pasta de saída já existir.
+O `_local/config_lucas.yaml` (fora do git) é o `config.yaml` com só os caminhos da base trocados
+para o Drive. Antes de abrir o teste, conferimos que os dados desta máquina reproduzem os do
+Kauan:
 
-O script 27 já foi conferido na validação, com as duas avaliações versionadas: reproduziu a
-diferença pareada registrada em `docs/11` (0,342, IC95% 0,252 a 0,437). A figura está em
-`relatorios/experimentos/comparacao_validacao_cnn_rf/froc.png`. A do teste só existirá depois do
-script 26.
+- `candidates_V2.csv`, `annotations.csv` e `annotations_excluded.csv` com os mesmos md5 do
+  `dvc.lock`; a `divisao.csv` restaurada do Git com o SHA-256 da decisão 0009.
+- Os volumes `.mha` do Drive somam 2,7 MB a mais que os do `dvc.lock`. São comprimidos, então
+  a diferença pode vir só da compressão. Para saber se importava, refizemos a avaliação de
+  **validação** do RF congelado com esses dados: CPM 0,409266, igual ao versionado, as sete
+  sensibilidades iguais, limites de IC diferentes em no máximo 0,0007. Só 156 de 75.063 escores
+  mudaram (no máximo 0,01); nos que examinamos, a feature estava a cerca de 6×10⁻⁸ (relativo) de
+  um limiar de corte das árvores, ruído de ponto flutuante entre CPUs.
+- Os recortes do Drive não tinham o campo de procedência (são de 01/10). Regeneramos os 176
+  exames de teste com o `scripts/09_extrair_patches.py` atual; os arrays saíram idênticos aos do
+  Drive, e a procedência bate com o código do repositório. Para isso, os `.py` foram usados com
+  fim de linha LF, como no Linux: com CRLF os hashes de código da procedência seriam outros.
+
+Uma primeira execução do script 26 parou na conferência de procedência, antes de qualquer
+previsão ou run do MLflow: um dos 176 recortes tinha sido regerado com uma versão antiga do
+script 09 durante uma troca de branch. O arquivo foi refeito e o script rodou uma vez até o fim.
+O teste foi lido uma única vez para o RF.
+
+O run `41ecf929` anota o commit `be7b32d`, que depois teve só a mensagem reescrita para
+`7af2d0b`; a árvore de arquivos dos dois é a mesma.
 
 ## 4. Três sementes da rede, na validação
 
@@ -154,10 +189,10 @@ IC95% do CPM 0,681 a 0,819, run `2f8b0a3c57c84d9e8f51dea2eab94b7f`.
 
 Com uma semente só, média e desvio não existem; não os calculamos.
 
-**Bloqueio.** O treino precisa dos recortes de treino e validação (`dados/processado/patches`),
-da lista V2 e das anotações, e de GPU CUDA. Esta máquina não tem os dados e tem GPU AMD, sem
-CUDA; o PyTorch instalado é só CPU. Treinar na CPU também mudaria o modo de determinismo em
-relação à semente 42 (decisão 0007). Comandos na decisão 0010.
+**Pendente com o Kauan.** O treino precisa de GPU CUDA, como o da semente 42. A máquina do Lucas
+tem a base, mas a GPU é AMD; na CPU cada semente levaria cerca de 4 horas e mudaria o modo de
+determinismo em relação à semente 42 (decisão 0007). O grupo decidiu, em 26/10/2026, que o
+Kauan treina as duas sementes na RTX 4050. Comandos na decisão 0010.
 
 Três análises que não se misturam:
 
@@ -173,7 +208,7 @@ Três análises que não se misturam:
 | Zheng et al. (2022) | CPM 0,906; 0,960 a 4 FP | 10 dobras, sistema completo | Literatura |
 | Trilha de redução de FP do LUNA16 | CPM 0,758 a 0,908 | 10 dobras, lista V2, avaliador oficial | Literatura |
 | Random Forest centro | CPM 0,409; 0,559 a 4 FP (IC95% 0,453 a 0,650) | Validação | Medido |
-| Random Forest centro | — | Teste | Pendente |
+| Random Forest centro | CPM 0,420; 0,520 a 4 FP (IC95% 0,442 a 0,603) | Teste | Medido |
 | CNN `cnn_lr_3e-4` | CPM 0,724; 0,883 a 4 FP (IC95% 0,843 a 0,929) | Teste | Medido |
 | Meta do baseline | sensibilidade ≥ 0,70 a 4 FP por exame | Um ponto da FROC | Meta, não resultado |
 | Meta da CNN | sensibilidade ≥ 0,80 a 4 FP por exame | Um ponto da FROC | Meta, não resultado |
@@ -187,5 +222,5 @@ meta de 0,80 a 4 FP não equivale a CPM 0,80. Comparamos cada meta com a nossa s
 Situação das metas, sem transformar meta em resultado:
 
 - **CNN:** no teste, 0,883 a 4 FP, com o IC95% inteiro acima de 0,80.
-- **Random Forest centro:** na validação, 0,559 a 4 FP, com o IC95% inteiro abaixo de 0,70. No
-  teste, pendente.
+- **Random Forest centro:** no teste, 0,520 a 4 FP, com o IC95% (0,442 a 0,603) inteiro abaixo
+  da meta de 0,70; na validação, 0,559. A meta do baseline não foi atingida.

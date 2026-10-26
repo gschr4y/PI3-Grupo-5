@@ -18,7 +18,8 @@ Fonte de cada número: `docs/14-baseline-literatura-sementes-e-teste-rf.md`. Ond
 > Protocolos diferentes: os artigos geram os próprios candidatos e fazem 10 dobras sobre os 888
 > exames; nós classificamos a lista V2 e medimos num teste fixo de 176 exames.
 
-**Nosso baseline:** Random Forest centro — CPM 0,409 na validação; teste **pendente**.
+**Nosso baseline:** Random Forest centro — CPM 0,420 no teste (0,409 na validação). Nossa CNN: CPM
+0,724 no teste. Gráfico das duas no teste: `relatorios/experimentos/comparacao_teste/froc.png`.
 
 **Nossas metas** (sensibilidade a 4 FP por exame, não CPM): baseline ≥ 70% · CNN ≥ 80%.
 
@@ -26,8 +27,7 @@ Fonte de cada número: `docs/14-baseline-literatura-sementes-e-teste-rf.md`. Ond
 mais parecido com o nosso protocolo é a trilha de redução de falsos positivos do próprio
 desafio. As metas são em sensibilidade a 4 falsos positivos, um ponto da curva, e não em CPM."
 
-*Antes de apresentar:* o grupo confirma que o "Li 2025" é o DOI 10.1038/s41598-025-97187-w e,
-depois do script 26, troca "pendente" pelo CPM do Random Forest no teste.
+*Antes de apresentar:* o grupo confirma que o "Li 2025" é o DOI 10.1038/s41598-025-97187-w.
 
 ---
 

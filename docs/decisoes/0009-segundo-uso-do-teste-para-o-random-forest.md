@@ -1,6 +1,6 @@
 # 0009: segundo uso do teste, só para medir o Random Forest centro congelado
 
-**Estado:** decidido antes de abrir o teste pela segunda vez; avaliação ainda não executada
+**Estado:** decidido antes de abrir o teste pela segunda vez; executado uma vez em 26/10/2026
 **Data:** 26/10/2026
 
 ## Contexto
@@ -62,6 +62,14 @@ feita depois de conhecermos o teste da rede; o modelo que vai ao teste é o de 1
 
 **Reportar o Random Forest só se ele ficar acima da meta, ou rodar mais de uma vez.** Transformaria
 o teste em validação.
+
+## Resultado
+
+Executado uma vez em 26/10/2026, run do MLflow `41ecf929305b4edf9e14fc5839d8513b`, com os hashes
+acima conferidos pelo script: **CPM 0,420 (IC95% 0,349 a 0,490)**, sensibilidade 0,381 a 1 FP e
+0,520 a 4 FP por exame. Nas mesmas reamostras, a CNN ficou 0,304 de CPM acima (IC95% 0,247 a
+0,360). Detalhes, dados usados e verificações em
+`docs/14-baseline-literatura-sementes-e-teste-rf.md`, seção 3.
 
 ## Consequências
 

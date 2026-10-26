@@ -36,3 +36,7 @@ Na validação, a mesma configuração teve CPM 0,752 (IC95% de 0,681 a 0,819) e
 4 FP por exame.
 
 O Random Forest não foi avaliado no teste.
+
+**Atualização de 26/10/2026.** Pela decisão 0009, o teste foi usado uma segunda vez, só para o
+Random Forest centro congelado: CPM 0,420 (IC95% 0,349 a 0,490). O resultado da CNN acima não
+mudou. Ver `docs/14-baseline-literatura-sementes-e-teste-rf.md`.

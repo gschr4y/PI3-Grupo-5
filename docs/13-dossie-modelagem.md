@@ -278,7 +278,9 @@ registrado na decisão 0008. Avaliamos uma vez nos 176 exames de teste, com 223 
 Dentro do corte de 100 marcas, 218 dos 223 nódulos tiveram candidato. O CPM do teste ficou 0,028
 abaixo do da validação.
 
-O Random Forest centro não foi avaliado no teste.
+O Random Forest centro não foi avaliado no teste. Em 26/10/2026, pela decisão 0009, ele foi
+avaliado uma vez no mesmo teste: CPM 0,420 (IC95% 0,349 a 0,490), 0,520 a 4 FP, e a CNN ficou
+0,304 de CPM acima (IC95% 0,247 a 0,360) nas mesmas reamostras (`docs/14`).
 
 ## 10. Erros encontrados e como corrigimos
 
@@ -314,8 +316,9 @@ fora dos 100 maiores escores.
   o CPM de validação dela tende a ser otimista. O número que estima o desempenho em exames novos
   é o do teste.
 - O teste já foi usado. Uma escolha nova feita a partir dele perde o valor de estimativa.
-- O Random Forest centro não tem avaliação no teste; a comparação entre os dois modelos com
-  intervalo existe só na validação.
+- O teste foi usado duas vezes: a segunda, em 26/10/2026, só para medir o Random Forest centro
+  congelado (decisão 0009). A comparação entre os dois modelos no teste é descritiva e não
+  escolheu modelo.
 - Os modelos usam a lista V2. A lista própria do grupo tem cobertura medida, mas não foi
   classificada.
 - A comparação com trabalhos publicados no LUNA16 está em
