@@ -1,0 +1,125 @@
+{
+  "avaliacao": "modelos/cnn_lr_3e-4_teste_final",
+  "exames": 176,
+  "nodulos": 223,
+  "conferencia_com_o_oficial": {
+    "cnn": {
+      "totais": {
+        "True positives": 218,
+        "False positives": 16072,
+        "Ignored candidates on excluded nodules": 1193
+      },
+      "sete_pontos": [
+        0.457399,
+        0.573991,
+        0.641256,
+        0.735426,
+        0.852018,
+        0.883408,
+        0.923767
+      ]
+    },
+    "random_forest": {
+      "totais": {
+        "True positives": 189,
+        "False positives": 16499,
+        "Ignored candidates on excluded nodules": 799
+      },
+      "sete_pontos": [
+        0.282511,
+        0.331839,
+        0.35426,
+        0.381166,
+        0.479821,
+        0.520179,
+        0.587444
+      ]
+    }
+  },
+  "limiares": {
+    "1fp": 0.9941523700000001,
+    "4fp": 0.9706289000000001
+  },
+  "limiar_rf_4fp": 0.19597352083761374,
+  "achados": {
+    "1fp": 164,
+    "4fp": 197
+  },
+  "perdidos_4fp": 26,
+  "sem_marca_nas_100": 5,
+  "sem_candidato_v2_no_raio": 3,
+  "perdidos_pela_cnn_achados_pelo_rf_4fp": 3,
+  "falsos_positivos_4fp": 704,
+  "exames_com_falso_positivo_4fp": 150,
+  "parede_e_vizinhanca": {
+    "tabela_perto_longe_por_perdido_achado": [
+      [
+        9,
+        17
+      ],
+      [
+        25,
+        172
+      ]
+    ],
+    "razao_de_chances": 3.642,
+    "p_fisher": 0.0074,
+    "p_mann_whitney_distancia": 0.0307,
+    "mediana_borda_mm": {
+      "perdidos": 6.4,
+      "achados": 13.0
+    },
+    "falsos_positivos_perto_de_nodulo": {
+      "24": {
+        "a_menos_de_20_mm_de_nodulo": 0.625,
+        "a_menos_de_3_raios_de_nodulo": 0.583,
+        "a_3_mm_ou_menos_da_borda": 0.042
+      },
+      "100": {
+        "a_menos_de_20_mm_de_nodulo": 0.5,
+        "a_menos_de_3_raios_de_nodulo": 0.37,
+        "a_3_mm_ou_menos_da_borda": 0.05
+      },
+      "704": {
+        "a_menos_de_20_mm_de_nodulo": 0.239,
+        "a_menos_de_3_raios_de_nodulo": 0.141,
+        "a_3_mm_ou_menos_da_borda": 0.135
+      }
+    }
+  },
+  "falsos_positivos_por_tipo": {
+    "ao_lado_de_nodulo": 16,
+    "sobre_lesao_grande_ou_irregular": 11,
+    "opacidade_arredondada_isolada": 10,
+    "vaso": 10,
+    "parede_do_pulmao": 2,
+    "outra": 1
+  },
+  "mascaras_lidas": 162,
+  "sem_mascara": [],
+  "figuras": {
+    "perdidos": [
+      "perdidos_1.png",
+      "perdidos_2.png",
+      "perdidos_3.png",
+      "perdidos_4.png"
+    ],
+    "falsos_positivos": [
+      "falsos_positivos_1.png",
+      "falsos_positivos_2.png",
+      "falsos_positivos_3.png",
+      "falsos_positivos_4.png",
+      "falsos_positivos_5.png",
+      "falsos_positivos_6.png",
+      "falsos_positivos_7.png"
+    ],
+    "por_tipo": [
+      "tipo_ao_lado_de_nodulo.png",
+      "tipo_opacidade_arredondada_isolada.png",
+      "tipo_outra.png",
+      "tipo_parede_do_pulmao.png",
+      "tipo_sobre_lesao_grande_ou_irregular.png",
+      "tipo_vaso.png"
+    ]
+  }
+}

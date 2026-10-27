@@ -512,3 +512,14 @@ Congelamos essa CNN pela decisão 0008 e a avaliamos uma vez nos 176 exames de t
 `d754f0738780451a8a734be0ac58a435`. O CPM foi 0,724 (IC95% 0,670 a 0,778), com sensibilidade de
 0,735 a 1 FP por exame e de 0,883 a 4 FP por exame (IC95% 0,843 a 0,929). O registro está em
 `docs/12-avaliacao-final-teste.md`.
+
+## Atualização de 26/10/2026: onde a rede escolhida erra no teste
+
+Analisamos os erros da CNN congelada nos 176 exames de teste, lendo as previsões já gravadas,
+sem nova avaliação (`.venv/bin/python scripts/29_analisar_erros_cnn.py`). O casamento de marcas e
+nódulos reproduz os totais e os sete pontos do avaliador oficial. A 4 FP por exame a rede perde 26
+dos 223 nódulos: a sensibilidade vai de 0,804 nos nódulos de 3 a 5 mm a 0,969 nos acima de 10 mm,
+e nódulos encostados na parede do pulmão são perdidos com mais frequência (p = 0,007). Entre os
+falsos positivos de maior escore, o tipo mais frequente na nossa leitura visual é a marca ao lado
+de um nódulo verdadeiro. O registro está em `docs/15-analise-de-erros-cnn.md`.
+

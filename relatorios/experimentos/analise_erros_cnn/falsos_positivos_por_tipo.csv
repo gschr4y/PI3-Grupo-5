@@ -1,0 +1,7 @@
+tipo,falsos_positivos,fracao,nodulo_mais_proximo_mediana_mm,borda_mediana_mm
+ao_lado_de_nodulo,16,0.32,10.1,16.8
+sobre_lesao_grande_ou_irregular,11,0.22,14.8,18.5
+opacidade_arredondada_isolada,10,0.2,92.9,15.8
+vaso,10,0.2,13.5,22.8
+parede_do_pulmao,2,0.04,57.1,1.7
+outra,1,0.02,15.1,16.0

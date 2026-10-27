@@ -162,8 +162,11 @@ modelo congelado (decisão 0008):
 
 Os registros estão em [primeiro treino do Random Forest](docs/08-primeiro-treino.md),
 [comparação na validação](docs/10-comparacao-validacao.md),
-[experimentos na validação](docs/11-experimentos-validacao.md) e
-[avaliação final no teste](docs/12-avaliacao-final-teste.md).
+[experimentos na validação](docs/11-experimentos-validacao.md),
+[avaliação final no teste](docs/12-avaliacao-final-teste.md),
+[baseline da literatura, Random Forest no teste e sementes](docs/14-baseline-literatura-sementes-e-teste-rf.md) e
+[onde a rede erra no teste](docs/15-analise-de-erros-cnn.md), gerado por
+`.venv/bin/python scripts/29_analisar_erros_cnn.py`.
 
 **5. Testes**
 
@@ -222,9 +225,11 @@ reamostras por exame.
 |---|---|---|---|---|
 | CNN congelada (`cnn_lr_3e-4`) | teste, 176 exames | 0,724 (0,670 a 0,778) | 0,735 (0,659 a 0,819) | 0,883 (0,843 a 0,929) |
 | CNN congelada (`cnn_lr_3e-4`) | validação, 89 exames | 0,752 (0,681 a 0,819) | 0,784 | 0,883 |
+| Random Forest centro | teste, 176 exames | 0,420 (0,349 a 0,490) | 0,381 (0,314 a 0,460) | 0,520 (0,442 a 0,603) |
 | Random Forest centro | validação, 89 exames | 0,409 (0,323 a 0,505) | 0,405 | 0,559 |
 
 A CNN foi escolhida entre cinco versões pela validação e avaliada uma vez no teste. O Random
-Forest não foi avaliado no teste. Os detalhes estão em `docs/10` a `docs/12`, e o caminho
+Forest centro, congelado antes, foi avaliado no mesmo teste em 26/10/2026, só para comparação
+(decisão 0009; `docs/14`). Os detalhes estão em `docs/10` a `docs/14`, e o caminho
 inteiro, dos dados ao teste, com os erros encontrados, está no
 [dossiê da modelagem](docs/13-dossie-modelagem.md).

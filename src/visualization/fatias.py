@@ -7,6 +7,7 @@ import matplotlib
 # Sem display: os scripts rodam no terminal.
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import numpy as np
 import SimpleITK as sitk
 
 
@@ -92,3 +93,28 @@ def antes_e_depois(antes, depois, ponto_mundo, raio_mm: float, faixas, titulo: s
     saida.parent.mkdir(parents=True, exist_ok=True)
     figura.savefig(saida, dpi=150, bbox_inches="tight")
     plt.close(figura)
+
+
+def tres_planos(eixos, volume, centro_zyx, meio_lado: int, raio: float | None = None):
+    """Axial, coronal e sagital passando pelo centro, num recorte de 2 * meio_lado voxels.
+
+    `volume` isotrópico em (z, y, x) e já normalizado em [0, 1]. O círculo marca o raio do nódulo
+    anotado quando `raio` vem preenchido; sem ele, uma cruz marca o centro da marca do modelo.
+    """
+    z, y, x = (int(round(v)) for v in centro_zyx)
+    fundo = np.zeros((2 * meio_lado,) * 3, dtype=np.float32)
+    inicio = np.array([z, y, x]) - meio_lado
+    origem = np.maximum(inicio, 0)
+    limite = np.minimum(inicio + 2 * meio_lado, volume.shape)
+    fundo[tuple(slice(a - i, b - i) for a, b, i in zip(origem, limite, inicio))] = \
+        volume[tuple(slice(a, b) for a, b in zip(origem, limite))]
+    cortes = (fundo[meio_lado], fundo[:, meio_lado, :], fundo[:, :, meio_lado])
+    for eixo, corte, nome in zip(eixos, cortes, ("axial", "coronal", "sagital")):
+        # Coronal e sagital com o z crescendo para cima, como no exame.
+        eixo.imshow(corte, cmap="gray", vmin=0, vmax=1, origin="upper" if nome == "axial" else "lower")
+        if raio:
+            eixo.add_patch(plt.Circle((meio_lado, meio_lado), raio, fill=False, color="lime", linewidth=1))
+        else:
+            eixo.plot([meio_lado], [meio_lado], marker="+", color="red", markersize=9, markeredgewidth=1)
+        eixo.set_xticks([])
+        eixo.set_yticks([])

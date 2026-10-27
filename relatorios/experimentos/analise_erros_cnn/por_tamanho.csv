@@ -1,0 +1,5 @@
+faixa,nodulos,sem_marca_nas_100,achados_1fp,achados_4fp,sensibilidade_1fp,sensibilidade_4fp
+3 a 5 mm,46.0,4.0,24.0,37.0,0.522,0.804
+5 a 10 mm,112.0,1.0,83.0,97.0,0.741,0.866
+acima de 10 mm,65.0,0.0,57.0,63.0,0.877,0.969
+total,223.0,5.0,164.0,197.0,0.735,0.883

@@ -41,6 +41,12 @@ modelos/*
 !modelos/cnn_lr_3e-4_teste_final/
 !modelos/random_forest_centro/
 !modelos/random_forest_centro/modelo.joblib
+# O segundo uso do teste (decisão 0009) e as sementes extras da rede escolhida (decisão 0010).
+!modelos/random_forest_centro_teste_final/
+!modelos/cnn_lr_3e-4_semente_43/
+!modelos/cnn_lr_3e-4_semente_43/modelo.pt
+!modelos/cnn_lr_3e-4_semente_44/
+!modelos/cnn_lr_3e-4_semente_44/modelo.pt
 
 # Dados locais de rastreamento (metadados e artefatos permanecem fora do Git).
 mlflow.db

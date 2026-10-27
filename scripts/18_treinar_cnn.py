@@ -27,6 +27,8 @@ def argumentos():
     parser.add_argument("--escopo", default="divisao_completa", help="identificação explícita da população avaliada")
     parser.add_argument("--reproduzir-de", type=Path, help="confere pesos, previsões e FROC contra execução anterior")
     parser.add_argument("--variante", help="nome em experimentos_cnn do YAML; sobrescreve chaves de cnn")
+    parser.add_argument("--semente", type=int,
+                        help="semente de treino no lugar de seed do YAML; o bootstrap da avaliação mantém seed (decisão 0010)")
     return parser.parse_args()
 
 
@@ -107,9 +109,12 @@ def main():
         device = "cuda" if torch.cuda.is_available() else "cpu"
     if device == "cuda" and not torch.cuda.is_available():
         raise ValueError("CUDA solicitada, mas indisponivel")
-    config.fixar_semente(cfg["seed"])
-    cnn.fixar_determinismo(cfg["seed"], parametros["threads"], device)
-    registro = {**parametros, "device": device, "seed": cfg["seed"], "torch": torch.__version__,
+    # A semente de treino muda amostra de negativos, sorteio do sampler, aumento e pesos iniciais.
+    # A da avaliação fica em seed, para todas as sementes usarem as mesmas reamostras por exame.
+    semente = cfg["seed"] if args.semente is None else args.semente
+    config.fixar_semente(semente)
+    cnn.fixar_determinismo(semente, parametros["threads"], device)
+    registro = {**parametros, "device": device, "seed": semente, "torch": torch.__version__,
                 "determinismo": "estrito" if device == "cpu" else "parcial_gpu",
                 "gpu": torch.cuda.get_device_name() if device == "cuda" else "nenhuma",
                 "arquitetura": "CNN3D_3conv_16_32_64", "escopo": args.escopo,
@@ -118,6 +123,8 @@ def main():
                 "confianca": cfg["avaliacao"]["intervalo_confianca"],
                 "preprocessamento": "V2_normalizado_0_1_mascara_pulmao_1mm_crop_central",
                 "sampler": "WeightedRandomSampler_replacement", "max_marcas_oficial": 100}
+    if args.semente is not None:
+        registro["seed_avaliacao"] = cfg["seed"]
     versao_dados = hashlib.sha256(json.dumps({
         nome: rastreamento.sha256(p) for nome, p in entrada.items()
         if nome in ("divisao", "candidatos", "anotacoes", "excluidas") or nome.startswith("patches/")
@@ -140,13 +147,13 @@ def main():
 
         inicio = perf_counter()
         modelo, selecionados, historico = cnn.treinar(candidatos, divisao, pasta, parametros,
-                                                     cfg["seed"], device, registrar)
+                                                     semente, device, registrar)
         metricas = {"treino_segundos": perf_counter() - inicio,
                     "treino_candidatos": len(selecionados),
                     "treino_positivos": int(selecionados["class"].sum())}
         peso_hash = cnn.hash_pesos(modelo)
         torch.save({"state_dict": modelo.cpu().state_dict(), "parametros": parametros,
-                    "seed": cfg["seed"], "dados_sha256": versao_dados,
+                    "seed": semente, "dados_sha256": versao_dados,
                     "run_id": run_id, "divisao_sha256": rastreamento.sha256(entrada["divisao"]),
                     "candidatos_sha256": rastreamento.sha256(entrada["candidatos"])}, destino / "modelo.pt")
         restaurado = cnn.CNN3D(parametros["dropout_rate"])

@@ -68,6 +68,14 @@ caminhos:
   diagnostico_random_forest: "relatorios/experimentos/diagnostico_random_forest"
   random_forest_centro: "modelos/random_forest_centro"
   caracteristicas_centro: "dados/intermediario/caracteristicas_centro"
+  # Segundo uso do teste, só para o Random Forest centro congelado. Ver decisão 0009.
+  random_forest_centro_teste: "modelos/random_forest_centro_teste_final"
+  comparacao_teste: "relatorios/experimentos/comparacao_teste"
+  sementes_cnn: "relatorios/experimentos/sementes_cnn"
+  # Onde a rede escolhida erra no teste: nódulos perdidos e falsos positivos, com figuras.
+  analise_erros_cnn: "relatorios/experimentos/analise_erros_cnn"
+  # Tipo de cada falso positivo de maior escore, classificado à mão olhando as figuras.
+  classificacao_falsos_positivos: "relatorios/anotacoes/falsos_positivos_cnn_teste.csv"
 
 selecao:
   # Os dez subsets do desafio, que são as dobras oficiais de validação cruzada.
@@ -209,6 +217,13 @@ experimentos_cnn:
     negativos_por_positivo: 20
     learning_rate: 0.0003
 
+# A rede escolhida repetida com outras sementes de treino, só na validação. As sementes foram
+# fixadas antes de treinar e não mudam depois de ver o resultado. Ver decisão 0010.
+sementes_cnn:
+  variante: lr_3e-4
+  original: 42
+  extras: [43, 44]
+
 # Modelos comparados na validação pelo script 23. As diferenças pareadas de CPM são contra a
 # referência, nas mesmas reamostras por exame do avaliador oficial.
 comparacao:
@@ -251,3 +266,24 @@ comparacao:
       rotulo: "Random Forest centro"
       avaliacao: modelos/random_forest_centro
       probabilidades: modelos/random_forest_centro/probabilidades_validacao.csv
+
+analise_erros:
+  # Lê as previsões já gravadas do teste da rede congelada (decisão 0008): não avalia o teste de
+  # novo e não escolhe nada.
+  avaliacao: modelos/cnn_lr_3e-4_teste_final
+  # O Random Forest no mesmo teste, para ver se ele acha algum nódulo que a rede perde.
+  comparar_com: modelos/random_forest_centro_teste_final
+  # Os dois pontos que o enunciado manda reportar.
+  fp_por_exame: [1, 4]
+  # Faixas de diâmetro em mm: 3 a 5, 5 a 10 e acima de 10. O LUNA16 só anota a partir de 3 mm.
+  faixas_diametro: [3, 5, 10]
+  # Falsos positivos de maior escore que entram nas figuras.
+  falsos_positivos_figura: 50
+  # Lado do recorte das figuras, em voxels de 1 mm: o dobro do recorte de 32 que a rede vê.
+  recorte_figura: 64
+  casos_por_figura: 8
+  exemplos_por_tipo: 4
+  # A distância à borda do pulmão é medida até este valor, em mm; acima dele conta como o próprio valor.
+  distancia_borda_maxima: 30
+  # Até quantos mm da borda um ponto conta como encostado na parede.
+  perto_da_borda: 3
