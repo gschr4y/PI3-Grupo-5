@@ -163,8 +163,10 @@ modelo congelado (decisão 0008):
 Os registros estão em [primeiro treino do Random Forest](docs/08-primeiro-treino.md),
 [comparação na validação](docs/10-comparacao-validacao.md),
 [experimentos na validação](docs/11-experimentos-validacao.md),
-[avaliação final no teste](docs/12-avaliacao-final-teste.md) e
-[baseline da literatura, Random Forest no teste e sementes](docs/14-baseline-literatura-sementes-e-teste-rf.md).
+[avaliação final no teste](docs/12-avaliacao-final-teste.md),
+[baseline da literatura, Random Forest no teste e sementes](docs/14-baseline-literatura-sementes-e-teste-rf.md) e
+[onde a rede erra no teste](docs/15-analise-de-erros-cnn.md), gerado por
+`.venv/bin/python scripts/29_analisar_erros_cnn.py`.
 
 **5. Testes**
 
